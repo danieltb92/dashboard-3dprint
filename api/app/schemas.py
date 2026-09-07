@@ -19,7 +19,12 @@ class ProductBase(BaseModel):
 
 class ProductionLotBase(BaseModel):
     product_id: int
-    quantity: int
+    printer_id: int
+    material_id: int
+    qty: int
+    peso_g: float
+    horas: float
+    minutos: float
 
 
 class SaleBase(BaseModel):
