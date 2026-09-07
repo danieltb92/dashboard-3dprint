@@ -1,0 +1,33 @@
+SKU,Producto,Precio de costo,Margen de Beneficio,Precio de Venta,Ganancia,Margen de Utilidad,% Descuento / Ganancia,Ganancia con Descuento,% Descuento / Precio,Precio con Descuento,UUID
+INT-001,Rack Filamento 2 puestos, $17.782,0%, $17.782, $0,0%,0%, $0,0%, $17.782,8807503a-b51e-4835-a41d-c1c1c2b60221
+LL-001-B,Llavero-GatoFlex-Short-PLA-Ender-Blanco, $4.386,128%, $10.000, $5.614,56%,36%, $3.614,20%, $8.000,7becb6c0-70a9-4538-9407-746fd7ab5ef1
+LL-001-N,Llavero-GatoFlex-Short-PLA-Ender-Negro, $4.386,128%, $10.000, $5.614,56%,36%, $3.614,20%, $8.000,ee5d11ce-4c26-4ac8-b5bd-cccfdae57b93
+LL-002-B,Llavero-Esqueleto_Dragon-PLA-Ender-Blanco, $5.042,98%, $10.000, $4.958,50%,40%, $2.958,20%, $8.000,a6d0fb8c-d262-4323-b992-382b581520c8
+LL-002-N,Llavero-Esqueleto_Dragon-PLA-Ender-Negro, $5.042,98%, $10.000, $4.958,50%,40%, $2.958,20%, $8.000,2266fec3-eeec-402a-bea8-acb54209b26b
+LL-002-NA,Llavero-Esqueleto_Dragon-PLA-4D-Lab-Bicolor, $5.429,158%, $14.000, $8.571,61%,47%, $4.571,29%, $10.000,a9f26113-0e8f-43da-a504-62e759d33236
+LL-002-NT,Llavero-Esqueleto_Dragon-PLA-Fill_3D, $5.429,158%, $14.000, $8.571,61%,47%, $4.571,29%, $10.000,3f90f083-eb83-408b-ad20-be4ed23f722a
+LL-003-B,Llavero-Hamster-PLA-Ender-Blanco, $4.507,122%, $10.000, $5.493,55%,36%, $3.493,20%, $8.000,dc75ed96-4c28-4184-854c-e1b8278c094e
+LL-003-N,Llavero-Hamster-PLA-Ender-Negro, $4.507,122%, $10.000, $5.493,55%,36%, $3.493,20%, $8.000,24e52f12-7f56-4eb5-b56e-137fb0b6a151
+LL-004-B,Llavero-MiniPig-PLA-Ender-Blanco, $4.076,145%, $10.000, $5.924,59%,34%, $3.924,20%, $8.000,cee37260-00b4-4cfb-a60d-983cea4df97d
+LL-004-N,Llavero-MiniPig-PLA-Ender-Negro, $4.076,145%, $10.000, $5.924,59%,34%, $3.924,20%, $8.000,e53801a4-8c47-47c8-96ac-14173578e72f
+LL-005-B,Llavero-Arti-GatoAnime-PLA-Ender-Blanco, $3.132,219%, $10.000, $6.868,69%,29%, $4.868,20%, $8.000,cab09c37-8fe3-4c26-89e1-f738babe332d
+LL-005-N,Llavero-Arti-GatoAnime-PLA-Ender-Negro, $3.132,219%, $10.000, $6.868,69%,29%, $4.868,20%, $8.000,381ea511-46eb-444e-8281-02a3c4785abc
+LL-005-NA,Llavero-Arti-GatoAnime-PLA-4D-Lab-Bicolor, $3.287,326%, $14.000, $10.713,77%,37%, $6.713,29%, $10.000,4435ca36-8181-4f9c-a2fe-f8f9341fec3e
+LL-006-B,Llavero-Calavera-PLA-Creality_Ender, $3.287,143%, $8.000, $4.713,59%,0%, $4.713,0%, $8.000,a4f694a9-cdb5-4b2b-b347-65d4f183b9b6
+LL-006-N,Llavero-Calavera-PLA-Creality_Ender, $5.053,58%, $8.000, $2.947,37%,0%, $2.947,0%, $8.000,205b241c-9cc6-4fe1-a5e9-ee9b965369f6
+LL-006-NA,Llavero-Calavera-PLA-4D-Lab-Bicolor, $4.684,114%, $10.000, $5.316,53%,38%, $3.316,20%, $8.000,514fae2f-d5f3-4775-8f2f-27085e12d8a8
+LL-006-NT,Llavero-Calavera-PLA-Fill_3D, $4.930,103%, $10.000, $5.070,51%,39%, $3.070,20%, $8.000,8da31e4a-c0c8-4bfa-9c57-54deb5bf6c26
+LL-007-NA,Llavero-Mimir-PLA-4D-Lab-Bicolor, $3.082,225%, $10.000, $6.918,69%,29%, $4.918,20%, $8.000,9f4722e0-96a3-4abe-991a-f39a9dcf9363
+LL-007-NT,Llavero-Mimir-PLA-Fill_3D, $3.194,213%, $10.000, $6.806,68%,29%, $4.806,20%, $8.000,40b4c716-fa02-49f3-a77a-520c989a1b5d
+LL-008,Tag-Nombre, $2.291,249%, $8.000, $5.709,71%,0%, $5.709,0%, $8.000,1628ac40-15ab-4974-b1de-669eacb9673e
+PE-001,Adaptador-GoPro-Helmet, $3.264,390%, $16.000, $12.736,80%,126%,- $3.264,100%,,dece4b34-6032-46a0-8439-4a95f1bd93b3
+PE-002,Adaptador-GoPro-AGV_K1S, $3.556,800%, $32.000, $28.444,89%,35%, $18.444,31%, $22.000,a4e8140c-0a99-4565-b4a3-aabed9577058
+PE-003-01,Portavaso-V1, $3.595,10%, $3.964, $369,9%,1074%,- $3.595,100%,,f14fa0f4-aac1-4957-b1ab-7f13714f48b3
+PE-003-02,Nombre-Yinna, $1.823,339%, $8.000, $6.177,77%,130%,- $1.823,100%,,7100b331-adef-48a0-b0ca-6342cd94b5be
+PE-003-03,Letras-YT, $1.829,3%, $1.885, $56,3%,3356%,- $1.829,100%,,25016fb2-83c9-4fa3-bc6d-c15a0a996da6
+PE-003-04,Letras-YT_mini, $1.569,219%, $5.000, $3.431,69%,146%,- $1.569,100%,,7662e2e8-1768-4abc-b8ff-4c6534fad390
+PE-004,Figura-REPO, $10.780,104%, $22.000, $11.220,51%,196%,- $10.780,100%,,e900f16c-3856-47c9-b077-3f015b557ed0
+PE-004-2,Figura-REPO-mini, $6.771,122%, $15.000, $8.229,55%,182%,- $6.771,100%,,17aeecc4-e403-4efd-8c1f-8c1609edce94
+PE-005,Porta retrato, $5.120,291%, $20.000, $14.880,74%,134%,- $5.120,100%,,f238abef-1968-4c54-af25-0ea8f46aa577
+PE-006,Separador-Cremallera, $2.411,107%, $5.000, $2.589,52%,193%,- $2.411,100%,,59ad4a34-1e28-4c79-8594-d2e7ee4a49ff
+LL-008-PR,Tag-Nombre-Personalizado, $2.285,0%, $2.285, $0,0%,1123674%,- $2.285,100%,,d3de663d-5296-4a53-b02d-f7cee8fd9d95

@@ -1,0 +1,28 @@
+services:
+  api:
+    build: ./api
+    volumes:
+      - ./api:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=sqlite:///./sql_app.db
+
+  web:
+    build: ./web
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+
+  db-backup:
+    image: alpine
+    container_name: db-backup
+    volumes:
+      - ./api/sql_app.db:/data/db.sqlite:ro
+    command: ["sh", "-c", "echo 'Backup service placeholder' && sleep infinity"]
