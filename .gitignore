@@ -1,0 +1,114 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node / Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+web/dist/
+web/build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/app.db
+data/*.db
+*.db-journal
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Rclone config (contiene credenciales)
+data/rclone.conf
+scripts/rclone.conf
+
+# Backups directory
+backups/
+
+# CSV templates (ya incluidos en el repo, pero ignorar copias)
+# Plantilla*.csv se mantienen en el repo para referencia
+
+# Cache directories
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Docker volumes data (si se usan localmente)
+.docker/
+
+# Superpowers (ya está en git, mantener)
+# .superpowers/

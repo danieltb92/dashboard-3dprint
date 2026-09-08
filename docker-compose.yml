@@ -19,10 +19,19 @@ services:
       - "5173:5173"
     env_file:
       - .env
+    depends_on:
+      - api
 
   db-backup:
-    image: alpine
+    image: linuxserver/rclone:latest
     container_name: db-backup
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - CRON_SCHEDULE=0 3 * * *
     volumes:
       - ./api/sql_app.db:/data/db.sqlite:ro
-    command: ["sh", "-c", "echo 'Backup service placeholder' && sleep infinity"]
+      - ./config/rclone:/config/rclone
+      - ./scripts:/scripts
+    command: /scripts/backup.sh
