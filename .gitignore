@@ -98,8 +98,8 @@ scripts/rclone.conf
 # Backups directory
 backups/
 
-# CSV templates (ya incluidos en el repo, pero ignorar copias)
-# Plantilla*.csv se mantienen en el repo para referencia
+# CSV templates (plantillas Excel de referencia)
+Plantilla*.csv
 
 # Cache directories
 .ruff_cache/
