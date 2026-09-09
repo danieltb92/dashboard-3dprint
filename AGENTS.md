@@ -19,7 +19,10 @@ cd api
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-python seed_data.py  # Poblar BD con datos de ejemplo
+alembic upgrade head  # Aplicar el esquema
+# Opcional, solo para reiniciar datos de ejemplo locales:
+python seed_data.py
+pytest -q
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -30,7 +33,7 @@ pnpm install  # Primera vez
 npx pnpm dev  # Evita problemas de ExecutionPolicy en Windows
 ```
 
-- Backend: http://localhost:8000 (docs: /docs)
+- Backend: http://localhost:8000 (docs: /docs; negocio: /api/*)
 - Frontend: http://localhost:5173
 
 ### Deploy (Docker en NAS OMV)
@@ -83,17 +86,18 @@ dashboard-3dprint/
 
 2. **PostCSS config**: Es `.cjs` porque `package.json` tiene `"type": "module"`. Usa `@tailwindcss/postcss`, no `tailwindcss` directamente.
 
-3. **API proxy**: El frontend llama a `/api/*` que Vite **NO** proxea por defecto. El backend debe estar en `:8000` y el frontend hace llamadas directas a `http://localhost:8000/...` vía Axios.
+3. **API base**: El frontend llama directamente a `http://localhost:8000/api`; los routers de FastAPI están bajo el prefijo `/api`.
 
 4. **Tailwind CSS 4.x**: Usa `@tailwindcss/postcss`. No hay `tailwind.config.js` tradicional para v4.
 
 ### Backend
 
-1. **Base de datos**: SQLite en `data/app.db` (se crea automáticamente). Para popular con datos de ejemplo:
+1. **Base de datos y migraciones**: SQLite en `data/app.db`. Antes de iniciar o trabajar con una base nueva, aplicar el esquema con:
    ```powershell
    cd api
-   python seed_data.py
+   alembic upgrade head
    ```
+   `seed_data.py` es opcional y exclusivamente para datos de ejemplo; no ejecutarlo contra datos que se quieran conservar.
 
 2. **Montos en COP**: Todos los precios son **enteros** (sin decimales), en pesos colombianos. Las horas/gramos usan `Float` con 2 decimales.
 
@@ -109,7 +113,9 @@ dashboard-3dprint/
    - `labor_rate_cop=6470`
    - `margen_default=100`
 
-5. **No hay migraciones Alembic configuradas**: Para cambios de esquema, por ahora modificar `models.py` y recrear DB o hacer ALTER manual.
+5. **Migraciones Alembic**: La revisión inicial es `20260908_0001`. Todo cambio de esquema requiere una nueva revisión Alembic; no recrear la base de datos como mecanismo de migración.
+
+6. **Pruebas backend**: Ejecutar `cd api; pytest -q`. Las pruebas usan una base SQLite temporal aislada y no deben apuntar a `data/app.db`.
 
 ### Problemas conocidos
 

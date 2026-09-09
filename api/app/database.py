@@ -1,28 +1,53 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
 from pathlib import Path
 
-# Get the project root (two levels up from this file)
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = BASE_DIR / "data"
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-# Ensure data directory exists
-DATA_DIR.mkdir(exist_ok=True)
+from .core.config import settings
 
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DATA_DIR / 'app.db'}"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+DEFAULT_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _database_url() -> str:
+    configured_url = settings.database_url
+    if not configured_url:
+        return f"sqlite:///{DEFAULT_DATA_DIR / 'app.db'}"
+    # A relative SQLite URL in .env is relative to the repository, never to
+    # whichever directory happened to launch Uvicorn or Alembic.
+    if configured_url.startswith("sqlite:///./"):
+        relative_path = configured_url.removeprefix("sqlite:///./")
+        return f"sqlite:///{Path(__file__).resolve().parents[2] / relative_path}"
+    return configured_url
+
+
+SQLALCHEMY_DATABASE_URL = _database_url()
+connect_args = {"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
+
+
+@event.listens_for(engine, "connect")
+def enable_sqlite_foreign_keys(dbapi_connection, connection_record):
+    if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 def get_db():
     db = SessionLocal()
     try:
         yield db
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()

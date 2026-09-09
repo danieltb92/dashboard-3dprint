@@ -40,7 +40,7 @@ CORS_ORIGINS=http://localhost:5173
 
 ```powershell
 # Desde la carpeta api/ con el venv activado
-python -c "from app.database import engine; from app.models import Base; Base.metadata.create_all(bind=engine)"
+alembic upgrade head
 ```
 
 ### 4. Levantar el servidor de desarrollo
@@ -52,6 +52,13 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 El backend estará disponible en: **http://localhost:8000**
 - Docs interactivos: **http://localhost:8000/docs**
+
+### 5. Ejecutar las pruebas del backend
+
+```powershell
+# Desde api/ con el venv activado
+pytest -q
+```
 
 ---
 
@@ -104,7 +111,7 @@ npx pnpm dev
 
 1. Backend: Abre http://localhost:8000/docs y verifica que los endpoints aparezcan.
 2. Frontend: Abre http://localhost:5173 y verifica que cargue la interfaz.
-3. Integración: El frontend está configurado para llamar al backend en `http://localhost:8000/api` mediante proxy de Vite.
+3. Integración: El frontend llama al backend en `http://localhost:8000/api`.
 
 ---
 

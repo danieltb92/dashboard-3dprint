@@ -9,7 +9,7 @@ from sqlalchemy import (
     JSON,
 )
 from sqlalchemy.orm import relationship
-import datetime
+from datetime import UTC, datetime
 from .database import Base
 
 
@@ -64,7 +64,7 @@ class ProductionLot(Base):
     desglose_json = Column(JSON)
     costo_unitario_cop = Column(Integer)
     costo_total_cop = Column(Integer)
-    fecha = Column(DateTime, default=datetime.datetime.utcnow)
+    fecha = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     notas = Column(String, nullable=True)
 
     product = relationship("Product")
@@ -88,7 +88,7 @@ class Sale(Base):
     quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=True)
     qty = Column(Integer)
     precio_unitario_cop = Column(Integer)
-    fecha = Column(DateTime, default=datetime.datetime.utcnow)
+    fecha = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
     product = relationship("Product")
     client = relationship("Client")
@@ -100,11 +100,14 @@ class Quote(Base):
     client_id = Column(Integer, ForeignKey("clients.id"))
     lineas_json = Column(JSON)
     subtotal = Column(Integer)
-    iva = Column(Integer)
+    iva = Column(Integer, default=0)
+    envio_cop = Column(Integer, default=0)
+    otros_cargos_cop = Column(Integer, default=0)
     total = Column(Integer)
-    estado = Column(String)  # cotizada, aceptada, venta, rechazada, vencida
+    estado = Column(String)  # cotizada, aceptada, rechazada, vencida, vendida
+    produccion_estado = Column(String, nullable=True)  # None, en_produccion, completada
     vigencia_dias = Column(Integer)
-    fecha = Column(DateTime, default=datetime.datetime.utcnow)
+    fecha = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
     client = relationship("Client")
 
