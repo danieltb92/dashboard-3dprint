@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, Edit, Trash2, Search, X, Package, Loader2, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Package, Filter } from 'lucide-react';
+import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -7,6 +8,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card
 import { Badge } from '../components/ui/Badge';
 import { Table, createColumns } from '../components/ui/Table';
 import api from '../services/api';
+import { useToast } from '../components/ui/Toast';
 
 interface Product {
   id: number;
@@ -42,6 +44,7 @@ const ICON_DOLLAR = <span className="text-neutral-400 dark:text-neutral-500">$</
 const CATEGORY_OPTIONS = categories.map(c => ({ value: c, label: c }));
 
 export const Inventory = () => {
+  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -121,10 +124,10 @@ export const Inventory = () => {
 
       if (editingProduct) {
         await api.put(`/products/${editingProduct.id}`, payload);
-        alert('Producto actualizado exitosamente');
+        toast.success('Producto actualizado exitosamente');
       } else {
         await api.post('/products/', payload);
-        alert('Producto creado exitosamente');
+        toast.success('Producto creado exitosamente');
       }
 
       setShowModal(false);
@@ -133,7 +136,7 @@ export const Inventory = () => {
       fetchProducts();
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Error al guardar el producto');
+      toast.error('Error al guardar el producto');
     }
   }, [formData, editingProduct, validateForm, fetchProducts]);
 
@@ -156,7 +159,7 @@ export const Inventory = () => {
       fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Error al eliminar el producto');
+      toast.error('Error al eliminar el producto');
     }
   }, [fetchProducts]);
 
@@ -262,8 +265,21 @@ export const Inventory = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-10 w-10 animate-spin text-brand-600" aria-hidden="true" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-12 h-12 rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-44" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-32 rounded-lg" />
+        </div>
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-700">
+          <SkeletonTable rows={5} />
+        </div>
       </div>
     );
   }

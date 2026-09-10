@@ -6,6 +6,7 @@ import { Select } from '../components/ui/Select';
 import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import api from '../services/api';
+import { useToast } from '../components/ui/Toast';
 
 interface Printer {
   id: number;
@@ -69,6 +70,7 @@ const EMPTY_STATE_CHECKS = [
 ] as const;
 
 export const Calculator = () => {
+  const toast = useToast();
   const [printers, setPrinters] = useState<Printer[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [formData, setFormData] = useState({
@@ -78,6 +80,11 @@ export const Calculator = () => {
     hours: '',
     minutes: '',
     weight: '',
+    includeLabor: false,
+    prep_hours: '',
+    prep_min: '',
+    post_hours: '',
+    post_min: '',
   });
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -142,11 +149,15 @@ export const Calculator = () => {
         qty: parseInt(formData.pieces) || 1,
         minutos: totalMinutes,
         peso_g: parseFloat(formData.weight) || 0,
+        ...(formData.includeLabor ? {
+          prep_min: (parseFloat(formData.prep_hours) || 0) * 60 + (parseFloat(formData.prep_min) || 0) || null,
+          post_min: (parseFloat(formData.post_hours) || 0) * 60 + (parseFloat(formData.post_min) || 0) || null,
+        } : { prep_min: 0, post_min: 0 }),
       });
       setResult(response.data);
     } catch (error) {
       console.error('Error calculating:', error);
-      alert('Error al calcular el costo');
+      toast.error('Error al calcular el costo');
     } finally {
       setLoading(false);
     }
@@ -164,18 +175,22 @@ export const Calculator = () => {
         qty: parseInt(formData.pieces) || 1,
         minutos: hours * 60 + minutes,
         peso_g: parseFloat(formData.weight) || 0,
+        ...(formData.includeLabor ? {
+          prep_min: (parseFloat(formData.prep_hours) || 0) * 60 + (parseFloat(formData.prep_min) || 0) || null,
+          post_min: (parseFloat(formData.post_hours) || 0) * 60 + (parseFloat(formData.post_min) || 0) || null,
+        } : { prep_min: 0, post_min: 0 }),
       });
-      alert('Lote guardado exitosamente');
+      toast.success('Lote guardado exitosamente');
     } catch (error) {
       console.error('Error saving:', error);
-      alert('Error al guardar el lote');
+      toast.error('Error al guardar el lote');
     } finally {
       setSaving(false);
     }
   }, [formData, result]);
 
   const handleClear = useCallback(() => {
-    setFormData({ printer_id: '', material_id: '', pieces: '1', hours: '', minutes: '', weight: '' });
+    setFormData({ printer_id: '', material_id: '', pieces: '1', hours: '', minutes: '', weight: '', includeLabor: false, prep_hours: '', prep_min: '', post_hours: '', post_min: '' });
     setResult(null);
     setErrors({});
   }, []);
@@ -310,6 +325,70 @@ export const Calculator = () => {
             helperText="Peso total de filamento para la impresión"
             leftIcon={ICON_SCALE}
           />
+
+          {/* Labor toggle */}
+          <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+            <div className="flex items-center gap-3 mb-3">
+              <input
+                type="checkbox"
+                id="includeLabor"
+                checked={formData.includeLabor}
+                onChange={(e) => setFormData(prev => ({ ...prev, includeLabor: e.target.checked }))}
+                className="h-4 w-4 rounded border-neutral-300 dark:border-neutral-600 text-brand-600 focus:ring-brand-500"
+              />
+              <label htmlFor="includeLabor" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Incluir mano de obra (preparación y postprocesamiento)
+              </label>
+            </div>
+            {formData.includeLabor && (
+              <div className="space-y-4 pl-7">
+                <div className="grid gap-4 sm:grid-cols-4">
+                  <Input
+                    label="Prep (horas)"
+                    type="number"
+                    name="prep_hours"
+                    value={formData.prep_hours}
+                    onChange={handleChange}
+                    min={0}
+                    max={999}
+                    placeholder="0"
+                  />
+                  <Input
+                    label="Prep (min)"
+                    type="number"
+                    name="prep_min"
+                    value={formData.prep_min}
+                    onChange={handleChange}
+                    min={0}
+                    max={59}
+                    placeholder="0"
+                    helperText="Configuración, limpieza, etc."
+                  />
+                  <Input
+                    label="Post (horas)"
+                    type="number"
+                    name="post_hours"
+                    value={formData.post_hours}
+                    onChange={handleChange}
+                    min={0}
+                    max={999}
+                    placeholder="0"
+                  />
+                  <Input
+                    label="Post (min)"
+                    type="number"
+                    name="post_min"
+                    value={formData.post_min}
+                    onChange={handleChange}
+                    min={0}
+                    max={59}
+                    placeholder="0"
+                    helperText="Lijado, pintura, ensamblaje, etc."
+                  />
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Actions */}
           <CardFooter className="flex-wrap gap-3">

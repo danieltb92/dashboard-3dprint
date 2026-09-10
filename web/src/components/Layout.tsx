@@ -1,8 +1,9 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart } from 'lucide-react';
+import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart, Boxes, Wrench } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
+import { healthCheck } from '../services/api';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -11,6 +12,8 @@ const navItems = [
   { path: '/cotizaciones', label: 'Cotizaciones', icon: FileText },
   { path: '/clientes', label: 'Clientes', icon: Users },
   { path: '/pedidos', label: 'Pedidos', icon: ShoppingCart },
+  { path: '/impresoras', label: 'Impresoras', icon: Boxes },
+  { path: '/materiales', label: 'Materiales', icon: Wrench },
 ];
 
 const userItems = [
@@ -29,6 +32,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
     if (stored !== null) return stored === 'true';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+  const [apiStatus, setApiStatus] = useState<'loading' | 'ok' | 'error'>('loading');
 
   useEffect(() => {
     // Initialize from system preference on first load
@@ -37,6 +41,20 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setDarkMode(prefersDark);
     }
+  }, []);
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        await healthCheck();
+        setApiStatus('ok');
+      } catch {
+        setApiStatus('error');
+      }
+    };
+    check();
+    const interval = setInterval(check, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -83,10 +101,10 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         <div className="flex flex-col h-full">
           {/* Logo / Brand */}
           <div className={`flex items-center gap-3 p-4 border-b border-neutral-100 dark:border-neutral-800 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-            <span className="text-2xl" aria-hidden="true">🖨️</span>
+            <img src="/assets/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
             {!sidebarCollapsed && (
               <span className="text-xl font-bold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
-                3D Print Dashboard
+                DCapital Dashboard
               </span>
             )}
           </div>
@@ -125,7 +143,9 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             {/* Connection status */}
             {!sidebarCollapsed && (
               <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <Badge variant="success" size="sm" dot>API Conectada</Badge>
+                {apiStatus === 'loading' && <Badge variant="neutral" size="sm" dot>Verificando...</Badge>}
+                {apiStatus === 'ok' && <Badge variant="success" size="sm" dot>API Conectada</Badge>}
+                {apiStatus === 'error' && <Badge variant="danger" size="sm" dot>API Desconectada</Badge>}
               </div>
             )}
 

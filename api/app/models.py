@@ -75,9 +75,18 @@ class ProductionLot(Base):
 class Client(Base):
     __tablename__ = "clients"
     id = Column(Integer, primary_key=True, index=True)
+    codigo = Column(String, unique=True, index=True)  # CLI-001, CLI-002, etc.
     nombre = Column(String)
     contacto = Column(String)
     notas = Column(String, nullable=True)
+    telefono = Column(String, nullable=True)
+    direccion = Column(String, nullable=True)
+    ciudad = Column(String, nullable=True)
+    departamento = Column(String, nullable=True)
+    empresa = Column(String, nullable=True)
+    tipo_documento = Column(String, nullable=True)  # NIT, CC, CE, etc.
+    numero_documento = Column(String, nullable=True)
+    condicion_pago = Column(String, nullable=True)  # contado, 15_dias, 30_dias
 
 
 class Sale(Base):

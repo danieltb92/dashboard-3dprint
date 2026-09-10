@@ -167,6 +167,15 @@ Estas iniciativas se retomaran una vez validado el flujo principal y el desplieg
 | Diferencias entre frontend y backend | Usar esquemas de respuesta explicitos y tipos TypeScript derivados o mantenidos junto al cliente API. |
 | Perdida de datos en NAS | Volumen unico para `data`, backup probado y restauracion documentada. |
 
+## 9. Mejoras de usabilidad y professionalismo (Nuevas tareas)
+
+| Tarea | Descripción | Prioridad | Estado |
+| --- | --- | --- | --- |
+| API Conectada status tag | Check dinámico de conectividad via `GET /health` con polling cada 30s. Badge verde/rojo/gris en sidebar. | Alta | Completada |
+| Circle inicial cliente | Removido círculo con inicial de cliente de todas las páginas (Clientes, Quotes resumen, Quotes form creación, Quotes modal detalle). | Media | Completada |
+| Funcionalidad profesional | Toast notifications (`useToast` context), loading skeletons por página, validación mejorada en forms Quotes/Pedidos. | Baja | Completada |
+| Nomenclatura SKU | Formato `PRD-{categoria}-{secuencia}` (ej: `PRD-BOL-001`). Actualizar `models.py`, `seed_data.py` y routers/forms. | Media | Pendiente |
+
 ## 9. Resultado esperado
 
 Al finalizar la Fase 1, el proyecto deja de ser un conjunto de pantallas y endpoints de ejemplo y pasa a ser un MVP operativo para registrar configuracion, calcular costos auditables y guardar lotes de produccion. Las fases posteriores agregan inventario y operacion comercial sobre esa base estable.

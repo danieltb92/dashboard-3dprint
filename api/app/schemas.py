@@ -72,6 +72,14 @@ class ClientCreate(APIModel):
     nombre: NonEmpty
     contacto: NonEmpty
     notas: str | None = None
+    telefono: str | None = None
+    direccion: str | None = None
+    ciudad: str | None = None
+    departamento: str | None = None
+    empresa: str | None = None
+    tipo_documento: str | None = None
+    numero_documento: str | None = None
+    condicion_pago: str | None = None
 
 
 class ClientUpdate(ClientCreate):
@@ -80,6 +88,7 @@ class ClientUpdate(ClientCreate):
 
 class ClientRead(ClientCreate, ORMModel):
     id: int
+    codigo: str
 
 
 class LotCalculate(APIModel):
@@ -88,6 +97,8 @@ class LotCalculate(APIModel):
     qty: PositiveInt
     peso_g: PositiveFloat
     minutos: NonNegativeFloat
+    prep_min: float | None = None
+    post_min: float | None = None
 
 
 class ProductionLotCreate(LotCalculate):

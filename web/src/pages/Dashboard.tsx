@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, Package, FileText, Boxes, ShoppingCart, ArrowRight, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, Boxes, ShoppingCart, ArrowRight } from 'lucide-react';
+import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -107,8 +108,33 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-10 w-10 animate-spin text-brand-600" aria-hidden="true" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="w-12 h-12 rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-4 w-56" />
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-3">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-7 w-24" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-3">
+            <Skeleton className="h-5 w-32" />
+            <SkeletonTable rows={3} />
+          </div>
+          <div className="p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-3">
+            <Skeleton className="h-5 w-32" />
+            <SkeletonTable rows={3} />
+          </div>
+        </div>
       </div>
     );
   }

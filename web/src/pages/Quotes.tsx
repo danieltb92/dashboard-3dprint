@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, Trash2, FileText, UserPlus, X, Loader2, DollarSign, Calculator, Printer, Share2, Copy, CheckCircle, Send, FileEdit, MessageSquare, MapPin, Phone, Mail, Building2, Package } from 'lucide-react';
+import { Plus, Trash2, FileText, UserPlus, X, DollarSign, Calculator, Printer, Share2, Copy, CheckCircle, Send, FileEdit, MessageSquare, MapPin, Phone, Mail, Building2, Package } from 'lucide-react';
+import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -7,6 +8,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card
 import { Badge } from '../components/ui/Badge';
 import { Table } from '../components/ui/Table';
 import api from '../services/api';
+import { useToast } from '../components/ui/Toast';
 
 interface Product {
   id: number;
@@ -17,6 +19,7 @@ interface Product {
 
 interface Client {
   id: number;
+  codigo: string;
   nombre: string;
   contacto: string;
 }
@@ -36,6 +39,12 @@ interface ClientFormData {
   telefono: string;
   direccion: string;
   notas: string;
+  ciudad: string;
+  departamento: string;
+  empresa: string;
+  tipo_documento: string;
+  numero_documento: string;
+  condicion_pago: string;
 }
 
 interface QuoteFormData {
@@ -63,6 +72,7 @@ const ICON_FILE_TEXT_SM = <FileText className="h-6 w-6 text-brand-600" />;
 const ICON_PACKAGE = <Package className="h-4 w-4" />;
 
 export const Quotes = () => {
+  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
@@ -85,11 +95,18 @@ export const Quotes = () => {
     telefono: '',
     direccion: '',
     notas: '',
+    ciudad: '',
+    departamento: '',
+    empresa: '',
+    tipo_documento: '',
+    numero_documento: '',
+    condicion_pago: '',
   });
 
   const [showClientModal, setShowClientModal] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [acceptingQuote, setAcceptingQuote] = useState<any>(null);
   const [stockCheck, setStockCheck] = useState<{ has_stock: boolean; lines: any[] } | null>(null);
@@ -131,7 +148,7 @@ export const Quotes = () => {
 
   const clientOptions = useMemo(() => clients.map(c => ({
     value: String(c.id),
-    label: `${c.nombre} (${c.contacto})`,
+    label: `${c.codigo} — ${c.nombre}`,
   })), [clients]);
 
   // Memoized handlers
@@ -200,16 +217,32 @@ export const Quotes = () => {
     return { subtotal, iva, total };
   }, [formData.lineas, formData.iva_enabled, formData.envio_cop, formData.otros_cargos_cop]);
 
+  const validateForm = useCallback(() => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.client_id) newErrors.client_id = 'Selecciona un cliente';
+    if (formData.lineas.length === 0) {
+      newErrors.lineas = 'Agrega al menos una línea';
+    } else {
+      formData.lineas.forEach((line, i) => {
+        const qty = parseInt(line.qty);
+        const precio = parseFloat(line.precio_unitario_cop);
+        if (!qty || qty <= 0) newErrors[`linea_${line.id}_qty`] = 'Cantidad inválida';
+        if (!line.product_id && !line.custom_name) newErrors[`linea_${line.id}_producto`] = 'Selecciona un producto';
+        if (!precio || precio <= 0) newErrors[`linea_${line.id}_precio`] = 'Precio inválido';
+      });
+    }
+    if (!formData.vigencia_dias || formData.vigencia_dias <= 0) newErrors.vigencia_dias = 'Vigencia inválida';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formData]);
+
+  const clearError = useCallback((key: string) => {
+    if (errors[key]) setErrors(prev => ({ ...prev, [key]: '' }));
+  }, [errors]);
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.client_id) {
-      alert('Selecciona un cliente');
-      return;
-    }
-    if (formData.lineas.length === 0) {
-      alert('Agrega al menos una línea a la cotización');
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       const { subtotal, iva, total } = calculateTotals();
@@ -225,13 +258,13 @@ export const Quotes = () => {
         vigencia_dias: formData.vigencia_dias,
       });
 
-      alert('Cotización creada exitosamente');
+      toast.success('Cotización creada exitosamente');
       setFormData({ client_id: '', vigencia_dias: 8, notas: '', iva_enabled: false, envio_cop: 0, otros_cargos_cop: 0, lineas: [] });
       const quotesResp = await api.get('/quotes/');
       setQuotes(quotesResp.data);
     } catch (error) {
       console.error('Error creating quote:', error);
-      alert('Error al crear la cotización');
+      toast.error('Error al crear la cotización');
     }
   }, [formData, calculateTotals]);
 
@@ -242,10 +275,10 @@ export const Quotes = () => {
       const clientsResp = await api.get('/clients/');
       setClients(clientsResp.data);
       setShowClientModal(false);
-      setClientForm({ nombre: '', contacto: '', telefono: '', direccion: '', notas: '' });
+      setClientForm({ nombre: '', contacto: '', telefono: '', direccion: '', notas: '', ciudad: '', departamento: '', empresa: '', tipo_documento: '', numero_documento: '', condicion_pago: '' });
     } catch (error) {
       console.error('Error creating client:', error);
-      alert('Error al crear el cliente');
+      toast.error('Error al crear el cliente');
     }
   }, [clientForm]);
 
@@ -261,7 +294,7 @@ export const Quotes = () => {
       setShowAcceptModal(true);
     } catch (error) {
       console.error('Error checking stock:', error);
-      alert('Error al verificar stock');
+      toast.error('Error al verificar stock');
     }
   }, []);
 
@@ -274,10 +307,10 @@ export const Quotes = () => {
       setShowAcceptModal(false);
       setAcceptingQuote(null);
       setStockCheck(null);
-      alert('Venta creada exitosamente');
+      toast.success('Venta creada exitosamente');
     } catch (error) {
       console.error('Error creating sale:', error);
-      alert('Error al crear la venta');
+      toast.error('Error al crear la venta');
     }
   }, [acceptingQuote]);
 
@@ -292,7 +325,7 @@ export const Quotes = () => {
       setStockCheck(null);
     } catch (error) {
       console.error('Error starting production:', error);
-      alert('Error al iniciar producción');
+      toast.error('Error al iniciar producción');
     }
   }, [acceptingQuote]);
 
@@ -301,10 +334,10 @@ export const Quotes = () => {
       await api.patch(`/quotes/${quoteId}/complete-production`);
       const quotesResp = await api.get('/quotes/');
       setQuotes(quotesResp.data);
-      alert('Producción completada y venta creada');
+      toast.success('Producción completada y venta creada');
     } catch (error) {
       console.error('Error completing production:', error);
-      alert('Error al completar producción');
+      toast.error('Error al completar producción');
     }
   }, []);
 
@@ -351,7 +384,8 @@ export const Quotes = () => {
               placeholder="Selecciona un cliente"
               name="client_id"
               value={formData.client_id}
-              onChange={(e) => handleClientChange(e.target.value)}
+              onChange={(e) => { handleClientChange(e.target.value); clearError('client_id'); }}
+              error={errors.client_id}
             />
             <div className="flex flex-col">
               <Input
@@ -359,9 +393,10 @@ export const Quotes = () => {
                 type="number"
                 name="vigencia_dias"
                 value={formData.vigencia_dias}
-                onChange={(e) => handleVigenciaChange(e.target.value)}
+                onChange={(e) => { handleVigenciaChange(e.target.value); clearError('vigencia_dias'); }}
                 min={1}
                 leftIcon={ICON_CALENDAR}
+                error={errors.vigencia_dias}
               />
             </div>
           </div>
@@ -410,6 +445,7 @@ export const Quotes = () => {
               <Button variant="primary" onClick={addLine} leftIcon={ICON_PLUS}>
                 Agregar primera línea
               </Button>
+              {errors.lineas && <p className="text-sm text-danger-600 dark:text-danger-400 mt-2" role="alert">{errors.lineas}</p>}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -441,7 +477,8 @@ export const Quotes = () => {
                           options={productOptions}
                           placeholder="Seleccionar..."
                           value={line.product_id ? String(line.product_id) : ''}
-                          onChange={(e) => handleProductChange(line.id, e.target.value)}
+                          onChange={(e) => { handleProductChange(line.id, e.target.value); clearError(`linea_${line.id}_producto`); }}
+                          error={errors[`linea_${line.id}_producto`]}
                         />
                       </td>
 
@@ -461,8 +498,9 @@ export const Quotes = () => {
                           type="number"
                           min={1}
                           value={line.qty}
-                          onChange={(e) => handleQtyChange(line.id, e.target.value)}
+                          onChange={(e) => { handleQtyChange(line.id, e.target.value); clearError(`linea_${line.id}_qty`); }}
                           className="text-center w-full"
+                          error={errors[`linea_${line.id}_qty`]}
                         />
                       </td>
 
@@ -473,8 +511,9 @@ export const Quotes = () => {
                           min={0}
                           step={1}
                           value={line.precio_unitario_cop}
-                          onChange={(e) => handlePrecioChange(line.id, e.target.value)}
+                          onChange={(e) => { handlePrecioChange(line.id, e.target.value); clearError(`linea_${line.id}_precio`); }}
                           leftIcon={ICON_DOLLAR}
+                          error={errors[`linea_${line.id}_precio`]}
                         />
                       </td>
 
@@ -521,20 +560,13 @@ export const Quotes = () => {
             <CardHeader title="Resumen de la Cotización" />
             <CardContent className="space-y-4">
               {formData.client_id ? (
-                <div className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
-                  <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-brand-600 dark:text-brand-400 font-semibold text-sm">
-                      {clients.find(c => c.id === parseInt(formData.client_id))?.nombre?.charAt(0) || '?'}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-neutral-900 dark:text-neutral-100 truncate">
-                      {clients.find(c => c.id === parseInt(formData.client_id))?.nombre || 'Cliente'}
-                    </p>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400 truncate">
-                      {clients.find(c => c.id === parseInt(formData.client_id))?.contacto || ''}
-                    </p>
-                  </div>
+                <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                  <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                    {clients.find(c => c.id === parseInt(formData.client_id))?.nombre || 'Cliente'}
+                  </p>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                    {clients.find(c => c.id === parseInt(formData.client_id))?.contacto || ''}
+                  </p>
                 </div>
               ) : (
                 <p className="text-sm text-neutral-500 dark:text-neutral-400 italic">Selecciona un cliente para continuar</p>
@@ -745,8 +777,18 @@ export const Quotes = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-10 w-10 animate-spin text-brand-600" aria-hidden="true" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="w-12 h-12 rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-32" />
+            <Skeleton className="h-4 w-44" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-64 rounded-lg" />
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-700">
+          <SkeletonTable rows={4} />
+        </div>
       </div>
     );
   }
@@ -809,7 +851,7 @@ export const Quotes = () => {
       {/* New Client Modal */}
       {showClientModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { e.stopPropagation(); setShowClientModal(false); }}>
-          <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
             <CardHeader
               className="border-b border-neutral-100 dark:border-neutral-800 sticky top-0 bg-white dark:bg-neutral-900 z-10"
               title="Nuevo Cliente"
@@ -821,68 +863,141 @@ export const Quotes = () => {
               }
             />
             <CardContent className="p-6">
-              <form onSubmit={handleCreateClient} className="space-y-5">
-                {/* Avatar Preview */}
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
-                    <span className="text-brand-600 dark:text-brand-400 font-bold text-2xl">
-                      {clientForm.nombre ? clientForm.nombre.charAt(0).toUpperCase() : '?'}
-                    </span>
+              <form onSubmit={handleCreateClient} className="space-y-6">
+                {/* Datos Personales */}
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Datos Personales</h3>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Input
+                      label="Nombre completo"
+                      name="nombre"
+                      value={clientForm.nombre}
+                      onChange={(e) => setClientForm({ ...clientForm, nombre: e.target.value })}
+                      required
+                      placeholder="Ej: Juan Pérez"
+                    />
+                    <Input
+                      label="Empresa / Razón social"
+                      name="empresa"
+                      value={clientForm.empresa}
+                      onChange={(e) => setClientForm({ ...clientForm, empresa: e.target.value })}
+                      placeholder="Ej: Impresos3D S.A.S."
+                      leftIcon={<Building2 className="h-4 w-4 text-neutral-400" />}
+                    />
                   </div>
                 </div>
 
-                {/* Name */}
-                <Input
-                  label="Nombre completo"
-                  name="nombre"
-                  value={clientForm.nombre}
-                  onChange={(e) => setClientForm({ ...clientForm, nombre: e.target.value })}
-                  required
-                  placeholder="Ej: Juan Pérez"
-                />
+                {/* Documento */}
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Identificación</h3>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Select
+                      label="Tipo de documento"
+                      name="tipo_documento"
+                      value={clientForm.tipo_documento}
+                      onChange={(e) => setClientForm({ ...clientForm, tipo_documento: e.target.value })}
+                      options={[
+                        { value: '', label: 'Seleccionar...' },
+                        { value: 'NIT', label: 'NIT' },
+                        { value: 'CC', label: 'Cédula de Ciudadanía' },
+                        { value: 'CE', label: 'Cédula de Extranjería' },
+                        { value: 'RUT', label: 'RUT' },
+                        { value: 'pasaporte', label: 'Pasaporte' },
+                      ]}
+                    />
+                    <Input
+                      label="Número de documento"
+                      name="numero_documento"
+                      value={clientForm.numero_documento}
+                      onChange={(e) => setClientForm({ ...clientForm, numero_documento: e.target.value })}
+                      placeholder="Ej: 900.123.456-7"
+                    />
+                  </div>
+                </div>
 
-                {/* Contact & Phone */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Input
-                    label="Email"
-                    name="contacto"
-                    type="email"
-                    value={clientForm.contacto}
-                    onChange={(e) => setClientForm({ ...clientForm, contacto: e.target.value })}
-                    required
-                    placeholder="juan@empresa.com"
-                    leftIcon={<Mail className="h-4 w-4 text-neutral-400" />}
-                  />
-                  <Input
-                    label="Teléfono"
-                    name="telefono"
-                    value={clientForm.telefono}
-                    onChange={(e) => setClientForm({ ...clientForm, telefono: e.target.value })}
-                    placeholder="300 123 4567"
-                    leftIcon={<Phone className="h-4 w-4 text-neutral-400" />}
+                {/* Contacto */}
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Contacto</h3>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Input
+                      label="Email"
+                      name="contacto"
+                      type="email"
+                      value={clientForm.contacto}
+                      onChange={(e) => setClientForm({ ...clientForm, contacto: e.target.value })}
+                      required
+                      placeholder="juan@empresa.com"
+                      leftIcon={<Mail className="h-4 w-4 text-neutral-400" />}
+                    />
+                    <Input
+                      label="Teléfono"
+                      name="telefono"
+                      value={clientForm.telefono}
+                      onChange={(e) => setClientForm({ ...clientForm, telefono: e.target.value })}
+                      placeholder="300 123 4567"
+                      leftIcon={<Phone className="h-4 w-4 text-neutral-400" />}
+                    />
+                  </div>
+                </div>
+
+                {/* Ubicación */}
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Ubicación</h3>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Input
+                      label="Ciudad"
+                      name="ciudad"
+                      value={clientForm.ciudad}
+                      onChange={(e) => setClientForm({ ...clientForm, ciudad: e.target.value })}
+                      placeholder="Ej: Bogotá D.C."
+                      leftIcon={<MapPin className="h-4 w-4 text-neutral-400" />}
+                    />
+                    <Input
+                      label="Departamento"
+                      name="departamento"
+                      value={clientForm.departamento}
+                      onChange={(e) => setClientForm({ ...clientForm, departamento: e.target.value })}
+                      placeholder="Ej: Cundinamarca"
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <Input
+                      label="Dirección"
+                      name="direccion"
+                      value={clientForm.direccion}
+                      onChange={(e) => setClientForm({ ...clientForm, direccion: e.target.value })}
+                      placeholder="Calle 123 #45-67"
+                    />
+                  </div>
+                </div>
+
+                {/* Condiciones Comerciales */}
+                <div>
+                  <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Condiciones Comerciales</h3>
+                  <Select
+                    label="Condición de pago"
+                    name="condicion_pago"
+                    value={clientForm.condicion_pago}
+                    onChange={(e) => setClientForm({ ...clientForm, condicion_pago: e.target.value })}
+                    options={[
+                      { value: '', label: 'Seleccionar...' },
+                      { value: 'contado', label: 'Contado' },
+                      { value: '15_dias', label: 'Crédito 15 días' },
+                      { value: '30_dias', label: 'Crédito 30 días' },
+                      { value: '45_dias', label: 'Crédito 45 días' },
+                      { value: '60_dias', label: 'Crédito 60 días' },
+                    ]}
                   />
                 </div>
 
-                {/* Address */}
-                <Input
-                  label="Dirección"
-                  name="direccion"
-                  value={clientForm.direccion}
-                  onChange={(e) => setClientForm({ ...clientForm, direccion: e.target.value })}
-                  placeholder="Calle 123 #45-67, Ciudad"
-                  leftIcon={<MapPin className="h-4 w-4 text-neutral-400" />}
-                />
-
-                {/* Notes */}
+                {/* Notas */}
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
-                    Notas adicionales
-                  </label>
+                  <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Notas</h3>
                   <textarea
                     name="notas"
                     value={clientForm.notas}
                     onChange={(e) => setClientForm({ ...clientForm, notas: e.target.value })}
-                    placeholder="Empresa, preferencias, historial..."
+                    placeholder="Preferencias, historial, referencias..."
                     rows={2}
                     className="w-full px-3.5 py-2.5 border border-neutral-300 dark:border-neutral-600 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors duration-150 resize-none"
                   />
@@ -944,16 +1059,9 @@ export const Quotes = () => {
                 <div className="px-8 py-4 grid grid-cols-2 gap-6 border-b border-neutral-200 dark:border-neutral-700">
                   <div>
                     <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">Cliente</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
-                        <span className="text-brand-600 dark:text-brand-400 font-semibold text-sm">
-                          {selectedQuote.client?.nombre?.charAt(0) || '?'}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-neutral-900 dark:text-neutral-100">{selectedQuote.client?.nombre || 'Cliente no encontrado'}</p>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400">{selectedQuote.client?.contacto || ''}</p>
-                      </div>
+                    <div>
+                      <p className="font-semibold text-neutral-900 dark:text-neutral-100">{selectedQuote.client?.nombre || 'Cliente no encontrado'}</p>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">{selectedQuote.client?.contacto || ''}</p>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -1068,7 +1176,7 @@ export const Quotes = () => {
                     onClick={() => {
                       const text = `Cotización #${selectedQuote.id}\nCliente: ${selectedQuote.client?.nombre}\nTotal: ${formatCOP(selectedQuote.total)}\nVigencia: ${selectedQuote.vigencia_dias} días`;
                       navigator.clipboard.writeText(text);
-                      alert('Cotización copiada al portapapeles');
+                      toast.success('Cotización copiada al portapapeles');
                     }}
                   >
                     Copiar resumen
@@ -1097,7 +1205,7 @@ export const Quotes = () => {
                             setSelectedQuote(null);
                           } catch (error) {
                             console.error('Error updating quote status:', error);
-                            alert('Error al actualizar el estado');
+                            toast.error('Error al actualizar el estado');
                           }
                         }}
                       >
@@ -1135,7 +1243,7 @@ export const Quotes = () => {
                           setSelectedQuote(null);
                         } catch (error) {
                           console.error('Error updating quote status:', error);
-                          alert('Error al actualizar el estado');
+                          toast.error('Error al actualizar el estado');
                         }
                       }}
                     >

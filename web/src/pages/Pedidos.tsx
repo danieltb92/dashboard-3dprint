@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, Search, X, ShoppingCart, Loader2, DollarSign } from 'lucide-react';
+import { Plus, Search, X, ShoppingCart, DollarSign } from 'lucide-react';
+import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -7,6 +8,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card
 import { Badge } from '../components/ui/Badge';
 import { Table, createColumns } from '../components/ui/Table';
 import api from '../services/api';
+import { useToast } from '../components/ui/Toast';
 
 interface Sale {
   id: number;
@@ -47,6 +49,7 @@ const ICON_X = <X className="h-5 w-5" />;
 const ICON_DOLLAR = <DollarSign className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />;
 
 export const Pedidos = () => {
+  const toast = useToast();
   const [sales, setSales] = useState<Sale[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -175,13 +178,13 @@ export const Pedidos = () => {
         precio_unitario_cop: parseInt(formData.precio_unitario_cop),
       });
 
-      alert('Pedido creado exitosamente');
+      toast.success('Pedido creado exitosamente');
       setShowModal(false);
       resetForm();
       fetchData();
     } catch (error) {
       console.error('Error creating sale:', error);
-      alert('Error al crear el pedido');
+      toast.error('Error al crear el pedido');
     }
   }, [formData, validateForm, fetchData]);
 
@@ -277,8 +280,21 @@ export const Pedidos = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-10 w-10 animate-spin text-brand-600" aria-hidden="true" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-12 h-12 rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-24" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-32 rounded-lg" />
+        </div>
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-700">
+          <SkeletonTable rows={5} />
+        </div>
       </div>
     );
   }
