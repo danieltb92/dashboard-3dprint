@@ -380,6 +380,11 @@
 
 /* Dark mode overrides */
 @layer base {
+  .sidebar-brand {
+    background: linear-gradient(180deg, #0a1628 0%, #0f2140 50%, #0a1628 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   .dark {
     --color-surface-bg: var(--color-neutral-950);
     --color-surface-card: var(--color-neutral-900);

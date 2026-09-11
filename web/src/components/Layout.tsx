@@ -127,31 +127,31 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800
+          fixed inset-y-0 left-0 z-50 sidebar-brand
           transform transition-all duration-200 ease-out
           lg:translate-x-0
-          ${sidebarCollapsed ? 'w-18' : 'w-72'}
+          ${sidebarCollapsed ? 'w-16' : 'w-60'}
           ${window.innerWidth < 1024 ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') : ''}
         `}
         aria-label="Navegación principal"
       >
         <div className="flex flex-col h-full">
           {/* Logo / Brand */}
-          <div className={`flex items-center gap-3 p-4 border-b border-neutral-100 dark:border-neutral-800 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-            <img src="/assets/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+          <div className={`flex items-center gap-3 px-4 h-14 border-b border-white/10 ${sidebarCollapsed ? 'justify-center px-0' : ''}`}>
+            <img src="/assets/logo.png" alt="Logo" className="h-7 w-7 object-contain" />
             {!sidebarCollapsed && (
-              <span className="text-xl font-bold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
-                3D Print Dashboard
+              <span className="text-base font-bold text-white whitespace-nowrap tracking-heading">
+                3D Print
               </span>
             )}
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 space-y-4 overflow-y-auto scrollbar-thin" role="navigation" aria-label="Menú principal">
+          <nav className="flex-1 p-2.5 space-y-3 overflow-y-auto scrollbar-thin" role="navigation" aria-label="Menú principal">
             {navSections.map((section) => (
               <div key={section.title}>
                 {!sidebarCollapsed && (
-                  <h3 className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                  <h3 className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
                     {section.title}
                   </h3>
                 )}
@@ -166,16 +166,16 @@ export const Layout = ({ children }: { children: ReactNode }) => {
                         to={item.path}
                         onClick={closeSidebar}
                         className={({ isActive: active }) => `
-                          flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                          ${sidebarCollapsed ? 'justify-center' : ''}
+                          flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+                          ${sidebarCollapsed ? 'justify-center px-0' : ''}
                           ${active
-                            ? 'bg-brand-50 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400'
-                            : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100'}
+                            ? 'bg-white/15 text-white'
+                            : 'text-white/70 hover:bg-white/10 hover:text-white'}
                         `}
                         title={sidebarCollapsed ? item.label : undefined}
                         aria-current={isActive ? 'page' : undefined}
                       >
-                        <Icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                        <Icon className="h-[18px] w-[18px] flex-shrink-0" aria-hidden="true" />
                         {!sidebarCollapsed && (
                           <>
                             <span className="flex-1">{item.label}</span>
@@ -193,36 +193,36 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           </nav>
 
           {/* Bottom section */}
-          <div className="p-3 border-t border-neutral-100 dark:border-neutral-800 space-y-3">
+          <div className="p-2.5 border-t border-white/10 space-y-2">
             {/* Status Card */}
             {!sidebarCollapsed && (
-              <div className="rounded-xl bg-neutral-50 dark:bg-neutral-800/50 p-3 space-y-2.5">
+              <div className="rounded-lg bg-white/10 p-2.5 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
-                    <Printer className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+                  <div className="w-7 h-7 rounded-md bg-white/15 flex items-center justify-center">
+                    <Printer className="h-3.5 w-3.5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Taller</p>
-                    <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 truncate">Impresión 3D</p>
+                    <p className="text-[10px] font-medium text-white/50">Taller</p>
+                    <p className="text-xs font-semibold text-white truncate">Impresión 3D</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center gap-1.5 text-[11px]">
                   {apiStatus === 'loading' && (
                     <>
-                      <Circle className="h-2 w-2 fill-neutral-400 text-neutral-400 animate-pulse" />
-                      <span className="text-neutral-500">Conectando...</span>
+                      <Circle className="w-1.5 h-1.5 fill-white/40 text-white/40 animate-pulse" />
+                      <span className="text-white/50">Conectando...</span>
                     </>
                   )}
                   {apiStatus === 'ok' && (
                     <>
-                      <Circle className="h-2 w-2 fill-success-500 text-success-500" />
-                      <span className="text-success-600 dark:text-success-400 font-medium">Sistema operativo</span>
+                      <Circle className="w-1.5 h-1.5 fill-emerald-400 text-emerald-400" />
+                      <span className="text-emerald-300 font-medium">Sistema operativo</span>
                     </>
                   )}
                   {apiStatus === 'error' && (
                     <>
-                      <Circle className="h-2 w-2 fill-danger-500 text-danger-500" />
-                      <span className="text-danger-600 dark:text-danger-400 font-medium">Sin conexión</span>
+                      <Circle className="w-1.5 h-1.5 fill-red-400 text-red-400" />
+                      <span className="text-red-300 font-medium">Sin conexión</span>
                     </>
                   )}
                 </div>
@@ -239,42 +239,40 @@ export const Layout = ({ children }: { children: ReactNode }) => {
                   to={item.path}
                   onClick={closeSidebar}
                   className={({ isActive: active }) => `
-                    flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                    ${sidebarCollapsed ? 'justify-center' : ''}
+                    flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+                    ${sidebarCollapsed ? 'justify-center px-0' : ''}
                     ${active
-                      ? 'bg-brand-50 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400'
-                      : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100'}
+                      ? 'bg-white/15 text-white'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'}
                   `}
                   title={sidebarCollapsed ? item.label : undefined}
                   aria-current={isActive ? 'page' : undefined}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                  <Icon className="h-[18px] w-[18px] flex-shrink-0" aria-hidden="true" />
                   {!sidebarCollapsed && <span>{item.label}</span>}
                 </NavLink>
               );
             })}
 
             {/* Collapse toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-center"
+            <button
+              className="flex items-center justify-center w-full py-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
               onClick={toggleSidebar}
               aria-label={sidebarCollapsed ? 'Expandir menú' : window.innerWidth < 1024 ? 'Cerrar menú' : 'Colapsar menú'}
               aria-expanded={!sidebarCollapsed}
             >
               {window.innerWidth < 1024 ? (
-                <X className="h-5 w-5" aria-hidden="true" />
+                <X className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <ChevronLeft className={`h-5 w-5 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} aria-hidden="true" />
+                <ChevronLeft className={`h-4 w-4 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} aria-hidden="true" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className={`lg:ml-72 ${sidebarCollapsed ? 'lg:ml-18' : ''} min-h-screen transition-all duration-200`}>
+      <div className={`lg:ml-60 ${sidebarCollapsed ? 'lg:ml-16' : ''} min-h-screen transition-all duration-200`}>
         {/* Top Header */}
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">
