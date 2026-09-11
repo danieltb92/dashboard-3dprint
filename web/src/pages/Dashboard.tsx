@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, Package, FileText, Boxes, ShoppingCart, ArrowRight, CheckCircle2, Circle, Printer, Wrench, Calculator, Sun, Moon, Cloud } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, Boxes, ShoppingCart, ArrowRight, CheckCircle2, Circle, Printer, Wrench, Calculator, Sun, Moon, Cloud, Lightbulb, TrendingUp, DollarSign, TrendingDown } from 'lucide-react';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -147,6 +147,7 @@ export const Dashboard = () => {
   }, [fetchData]);
 
   const greeting = getGreeting();
+  const userName = useMemo(() => localStorage.getItem('userName') || 'Operador', []);
 
   // Onboarding checklist
   const onboardingSteps = useMemo(() => [
@@ -263,11 +264,11 @@ export const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Personalized Greeting */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 animate-fade-in delay-0">
         {greeting.icon}
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            {greeting.text}, Daniel
+          <h1 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100 tracking-heading">
+            {greeting.text}, {userName}
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 mt-0.5">Resumen de tu taller de impresión 3D</p>
         </div>
@@ -275,7 +276,7 @@ export const Dashboard = () => {
 
       {/* Onboarding Checklist */}
       {!allDone && (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden animate-fade-in delay-100">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -335,7 +336,7 @@ export const Dashboard = () => {
 
       {/* All done celebration */}
       {allDone && (
-        <Card className="bg-success-50 dark:bg-success-500/10 border-success-200 dark:border-success-500/30">
+        <Card className="bg-success-50 dark:bg-success-500/10 border-success-200 dark:border-success-500/30 animate-fade-in delay-100">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-success-100 dark:bg-success-500/20 flex items-center justify-center">
               <CheckCircle2 className="h-6 w-6 text-success-600 dark:text-success-400" />
@@ -353,8 +354,31 @@ export const Dashboard = () => {
       )}
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 animate-fade-in delay-200">
+        {/* Cotizaciones - Primary card */}
+        <Card className="sm:col-span-2 p-6 bg-gradient-to-br from-info-50 to-info-100/50 dark:from-info-500/10 dark:to-info-500/5 border-info-200 dark:border-info-500/30 hover:shadow-md transition-all duration-150">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-info-600 dark:text-info-400">Cotizaciones</p>
+              <p className="text-4xl font-bold text-info-700 dark:text-info-300 mt-2">{quotes.length}</p>
+              <p className="text-xs text-info-500 dark:text-info-400 mt-1">total realizadas</p>
+              {quotes.length > 0 && (
+                <div className="flex items-center gap-1 mt-3">
+                  <TrendingUp className="h-3.5 w-3.5 text-success-500" />
+                  <span className="text-xs font-medium text-success-600 dark:text-success-400">
+                    {quotes.filter(q => q.estado === 'aceptada').length} aceptadas
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-info-100 dark:bg-info-500/20 flex items-center justify-center text-info-600 dark:text-info-400">
+              <FileText className="h-6 w-6" />
+            </div>
+          </div>
+        </Card>
+
+        {/* Productos */}
+        <Card className="p-5 hover:shadow-md transition-all duration-150">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Productos</p>
@@ -369,20 +393,8 @@ export const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Cotizaciones</p>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mt-1">{quotes.length}</p>
-              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">total realizadas</p>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-info-50 dark:bg-info-500/20 flex items-center justify-center text-info-600 dark:text-info-400">
-              <FileText className="h-5 w-5" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-5">
+        {/* Lotes */}
+        <Card className="p-5 hover:shadow-md transition-all duration-150">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Lotes</p>
@@ -395,7 +407,8 @@ export const Dashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-5">
+        {/* Ventas */}
+        <Card className="p-5 hover:shadow-md transition-all duration-150">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Ventas</p>
@@ -410,23 +423,115 @@ export const Dashboard = () => {
       </div>
 
       {/* Revenue Summary */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 animate-fade-in delay-300">
         <Card className="p-5">
-          <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Ingresos por ventas</p>
-          <p className="text-3xl font-bold text-success-600 dark:text-success-400 mt-2 font-mono tabular-nums">
-            {formatCOP(totalRevenue)}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Ingresos por ventas</p>
+              <p className="text-3xl font-bold text-success-600 dark:text-success-400 mt-2 font-mono tabular-nums">
+                {formatCOP(totalRevenue)}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-lg bg-success-50 dark:bg-success-500/20 flex items-center justify-center text-success-600 dark:text-success-400">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+          </div>
         </Card>
         <Card className="p-5">
-          <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Costos de producción</p>
-          <p className="text-3xl font-bold text-warning-600 dark:text-warning-400 mt-2 font-mono tabular-nums">
-            {formatCOP(totalCost)}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Costos de producción</p>
+              <p className="text-3xl font-bold text-warning-600 dark:text-warning-400 mt-2 font-mono tabular-nums">
+                {formatCOP(totalCost)}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-lg bg-warning-50 dark:bg-warning-500/20 flex items-center justify-center text-warning-600 dark:text-warning-400">
+              <DollarSign className="h-5 w-5" />
+            </div>
+          </div>
         </Card>
       </div>
 
+      {/* Quick Actions */}
+      <div className="animate-fade-in delay-400">
+        <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-3">Acciones rápidas</h2>
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Primary action - Cotización */}
+          <Link to="/cotizaciones" className="sm:col-span-2 lg:col-span-1">
+            <Card className="p-4 bg-gradient-to-br from-info-50 to-info-100/50 dark:from-info-500/10 dark:to-info-500/5 border-info-200 dark:border-info-500/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 cursor-pointer group h-full">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-info-100 dark:bg-info-500/20 flex items-center justify-center text-info-600 dark:text-info-400 group-hover:bg-info-200 dark:group-hover:bg-info-500/30 transition-colors">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-info-700 dark:text-info-300">Nueva cotización</p>
+                  <p className="text-xs text-info-500 dark:text-info-400">Crear para cliente</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+          {/* Secondary actions */}
+          <Link to="/calculadora">
+            <Card className="p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 cursor-pointer group h-full">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand-50 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 group-hover:bg-brand-100 dark:group-hover:bg-brand-500/30 transition-colors">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Calcular costo</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Costo de producción</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+          <Link to="/inventario">
+            <Card className="p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 cursor-pointer group h-full">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand-50 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 group-hover:bg-brand-100 dark:group-hover:bg-brand-500/30 transition-colors">
+                  <Package className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Inventario</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Ver productos</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+          <Link to="/clientes">
+            <Card className="p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 cursor-pointer group h-full">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-success-50 dark:bg-success-500/20 flex items-center justify-center text-success-600 dark:text-success-400 group-hover:bg-success-100 dark:group-hover:bg-success-500/30 transition-colors">
+                  <ShoppingCart className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Clientes</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Gestionar cartera</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
+      {/* Tips Card */}
+      <Card className="bg-brand-50 dark:bg-brand-500/10 border-brand-200 dark:border-brand-500/30 animate-fade-in delay-500">
+        <CardContent className="p-5">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-lg bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center flex-shrink-0">
+              <Lightbulb className="h-5 w-5 text-brand-600 dark:text-brand-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-brand-800 dark:text-brand-300 mb-1">Consejo del día</h3>
+              <p className="text-sm text-brand-700 dark:text-brand-400">
+                Para calcular costos precisos, incluye siempre el <strong>tiempo de preparación</strong> y <strong>postprocesamiento</strong> en la calculadora. El merma del filamento (generalmente 10-15%) también afecta el costo final.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Activity Timeline */}
-      <Card>
+      <Card className="animate-fade-in delay-600">
         <CardHeader
           title="Actividad reciente"
           action={

@@ -190,10 +190,12 @@
   }
 
   :focus-visible {
-    outline: none;
-    ring: 3px solid var(--color-brand-200);
-    ring-offset: 2px;
-    ring-offset-color: var(--color-neutral-0);
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+
+  input, textarea, select {
+    caret-color: var(--color-brand-500);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -344,11 +346,36 @@
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
+  .tracking-heading { letter-spacing: -0.02em; }
   .scrollbar-thin { scrollbar-width: thin; scrollbar-color: var(--color-neutral-300) transparent; }
   .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background-color: var(--color-neutral-300); border-radius: 3px; }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover { background-color: var(--color-neutral-400); }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+    opacity: 0;
+  }
+
+  .delay-0 { animation-delay: 0ms; }
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-600 { animation-delay: 600ms; }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 /* Dark mode overrides */
@@ -374,8 +401,8 @@
   }
 
   .dark ::selection {
-    background-color: var(--color-brand-800);
-    color: var(--color-brand-100);
+    background-color: var(--color-brand-600);
+    color: var(--color-brand-50);
   }
 }
 

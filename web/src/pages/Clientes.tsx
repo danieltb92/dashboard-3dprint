@@ -446,9 +446,16 @@ export const Clientes = () => {
         <CardContent className="p-0">
           {filteredClients.length === 0 ? (
             <div className="text-center py-12 px-6">
-              {ICON_USERS_LG}
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg mb-4">
-                {clients.length === 0 ? 'No hay clientes registrados' : 'No se encontraron clientes'}
+              <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-neutral-400 dark:text-neutral-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
+                {clients.length === 0 ? 'Sin clientes aún' : 'Sin resultados'}
+              </h3>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4 max-w-xs mx-auto">
+                {clients.length === 0
+                  ? 'Registra tu primer cliente para empezar a crear cotizaciones.'
+                  : 'No se encontraron clientes con los filtros aplicados.'}
               </p>
               {clients.length === 0 && (
                 <Button onClick={openNewModal} leftIcon={ICON_PLUS_SM}>
@@ -471,7 +478,7 @@ export const Clientes = () => {
       {/* New/Edit Client Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { e.stopPropagation(); handleModalClose(); }}>
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-thin animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
             <CardHeader
               className="border-b border-neutral-100 dark:border-neutral-800 sticky top-0 bg-white dark:bg-neutral-900 z-10"
               title={editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}

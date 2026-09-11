@@ -369,9 +369,16 @@ export const Inventory = () => {
         <CardContent className="p-0">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12 px-6">
-              {ICON_PACKAGE_LG}
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg mb-4">
-                {products.length === 0 ? 'No hay productos registrados' : 'No se encontraron productos'}
+              <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+                <Package className="h-8 w-8 text-neutral-400 dark:text-neutral-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
+                {products.length === 0 ? 'Sin productos aún' : 'Sin resultados'}
+              </h3>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4 max-w-xs mx-auto">
+                {products.length === 0
+                  ? 'Registra tu primer producto para empezar a cotizar y controlar tu inventario.'
+                  : 'No se encontraron productos con los filtros aplicados.'}
               </p>
               {products.length === 0 && (
                 <Button onClick={openNewModal} leftIcon={ICON_PLUS_SM}>

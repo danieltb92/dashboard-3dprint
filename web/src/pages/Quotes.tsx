@@ -757,9 +757,14 @@ export const Quotes = () => {
         <CardContent className="p-0">
           {quotes.length === 0 ? (
             <div className="text-center py-12 px-6">
-              {ICON_FILE_TEXT}
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg">No hay cotizaciones registradas</p>
-              <p className="text-neutral-400 dark:text-neutral-500 text-sm mt-1">Crea tu primera cotización en la pestaña "Nueva Cotización"</p>
+              <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-neutral-400 dark:text-neutral-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Sin cotizaciones aún</h3>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4 max-w-xs mx-auto">
+                Crea tu primera cotización para empezar a vender productos impresos en 3D.
+              </p>
+              <p className="text-neutral-400 dark:text-neutral-500 text-xs">Usa la pestaña "Nueva Cotización" para comenzar</p>
             </div>
           ) : (
             <Table
@@ -851,7 +856,7 @@ export const Quotes = () => {
       {/* New Client Modal */}
       {showClientModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { e.stopPropagation(); setShowClientModal(false); }}>
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-thin animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
             <CardHeader
               className="border-b border-neutral-100 dark:border-neutral-800 sticky top-0 bg-white dark:bg-neutral-900 z-10"
               title="Nuevo Cliente"
@@ -1025,7 +1030,7 @@ export const Quotes = () => {
       {/* Quote Detail Modal */}
       {selectedQuote && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedQuote(null)}>
-          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto scrollbar-thin animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
             <CardHeader
               className="border-b border-neutral-100 dark:border-neutral-800 sticky top-0 bg-white dark:bg-neutral-900 z-10"
               title=""

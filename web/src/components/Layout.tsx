@@ -147,7 +147,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 space-y-4 overflow-y-auto" role="navigation" aria-label="Menú principal">
+          <nav className="flex-1 p-3 space-y-4 overflow-y-auto scrollbar-thin" role="navigation" aria-label="Menú principal">
             {navSections.map((section) => (
               <div key={section.title}>
                 {!sidebarCollapsed && (
