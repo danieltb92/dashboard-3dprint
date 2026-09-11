@@ -1,24 +1,50 @@
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart, Boxes, Wrench } from 'lucide-react';
+import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart, Boxes, Wrench, Circle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { healthCheck } from '../services/api';
 
-const navItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/calculadora', label: 'Calculadora', icon: Printer },
-  { path: '/inventario', label: 'Inventario', icon: Package },
-  { path: '/cotizaciones', label: 'Cotizaciones', icon: FileText },
-  { path: '/clientes', label: 'Clientes', icon: Users },
-  { path: '/pedidos', label: 'Pedidos', icon: ShoppingCart },
-  { path: '/impresoras', label: 'Impresoras', icon: Boxes },
-  { path: '/materiales', label: 'Materiales', icon: Wrench },
+interface NavItem {
+  path: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  badge?: string;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
+  {
+    title: 'Principal',
+    items: [
+      { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/calculadora', label: 'Calculadora', icon: Printer },
+    ],
+  },
+  {
+    title: 'Gestión',
+    items: [
+      { path: '/inventario', label: 'Inventario', icon: Package },
+      { path: '/cotizaciones', label: 'Cotizaciones', icon: FileText },
+      { path: '/clientes', label: 'Clientes', icon: Users },
+      { path: '/pedidos', label: 'Pedidos', icon: ShoppingCart },
+    ],
+  },
+  {
+    title: 'Taller',
+    items: [
+      { path: '/impresoras', label: 'Impresoras', icon: Boxes },
+      { path: '/materiales', label: 'Materiales', icon: Wrench },
+    ],
+  },
 ];
 
-const userItems = [
-  { label: 'Configuración', icon: Settings, path: '/settings' },
-  { label: 'Cerrar sesión', icon: LogOut, action: 'logout' },
+const bottomItems: NavItem[] = [
+  { path: '/settings', label: 'Configuración', icon: Settings },
 ];
 
 export const Layout = ({ children }: { children: ReactNode }) => {
@@ -35,7 +61,6 @@ export const Layout = ({ children }: { children: ReactNode }) => {
   const [apiStatus, setApiStatus] = useState<'loading' | 'ok' | 'error'>('loading');
 
   useEffect(() => {
-    // Initialize from system preference on first load
     const stored = localStorage.getItem('darkMode');
     if (stored === null) {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -76,6 +101,18 @@ export const Layout = ({ children }: { children: ReactNode }) => {
 
   const closeSidebar = () => setSidebarOpen(false);
 
+  const currentPageTitle = useMemo(() => {
+    for (const section of navSections) {
+      const found = section.items.find(item =>
+        location.pathname === item.path ||
+        (item.path !== '/' && location.pathname.startsWith(item.path))
+      );
+      if (found) return found.label;
+    }
+    if (bottomItems.find(item => location.pathname === item.path)) return 'Configuración';
+    return 'Dashboard';
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen bg-surface-bg">
       {/* Mobile overlay */}
@@ -104,29 +141,109 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             <img src="/assets/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
             {!sidebarCollapsed && (
               <span className="text-xl font-bold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
-                DCapital Dashboard
+                3D Print Dashboard
               </span>
             )}
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 space-y-1 overflow-y-auto" role="navigation" aria-label="Menú principal">
-            {navItems.map((item) => {
+          <nav className="flex-1 p-3 space-y-4 overflow-y-auto" role="navigation" aria-label="Menú principal">
+            {navSections.map((section) => (
+              <div key={section.title}>
+                {!sidebarCollapsed && (
+                  <h3 className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                    {section.title}
+                  </h3>
+                )}
+                <div className="space-y-0.5">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path ||
+                      (item.path !== '/' && location.pathname.startsWith(item.path));
+                    return (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        onClick={closeSidebar}
+                        className={({ isActive: active }) => `
+                          flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                          ${sidebarCollapsed ? 'justify-center' : ''}
+                          ${active
+                            ? 'bg-brand-50 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400'
+                            : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100'}
+                        `}
+                        title={sidebarCollapsed ? item.label : undefined}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        <Icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                        {!sidebarCollapsed && (
+                          <>
+                            <span className="flex-1">{item.label}</span>
+                            {item.badge && (
+                              <Badge variant="brand" size="sm">{item.badge}</Badge>
+                            )}
+                          </>
+                        )}
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+
+          {/* Bottom section */}
+          <div className="p-3 border-t border-neutral-100 dark:border-neutral-800 space-y-3">
+            {/* Status Card */}
+            {!sidebarCollapsed && (
+              <div className="rounded-xl bg-neutral-50 dark:bg-neutral-800/50 p-3 space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
+                    <Printer className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Taller</p>
+                    <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 truncate">Impresión 3D</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {apiStatus === 'loading' && (
+                    <>
+                      <Circle className="h-2 w-2 fill-neutral-400 text-neutral-400 animate-pulse" />
+                      <span className="text-neutral-500">Conectando...</span>
+                    </>
+                  )}
+                  {apiStatus === 'ok' && (
+                    <>
+                      <Circle className="h-2 w-2 fill-success-500 text-success-500" />
+                      <span className="text-success-600 dark:text-success-400 font-medium">Sistema operativo</span>
+                    </>
+                  )}
+                  {apiStatus === 'error' && (
+                    <>
+                      <Circle className="h-2 w-2 fill-danger-500 text-danger-500" />
+                      <span className="text-danger-600 dark:text-danger-400 font-medium">Sin conexión</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Settings link */}
+            {bottomItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path ||
-                (item.path !== '/' && location.pathname.startsWith(item.path));
+              const isActive = location.pathname === item.path;
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
                   onClick={closeSidebar}
                   className={({ isActive: active }) => `
-                    flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                    flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                     ${sidebarCollapsed ? 'justify-center' : ''}
                     ${active
-                      ? 'bg-brand-50 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 border-l-4 border-brand-600 dark:border-brand-500'
+                      ? 'bg-brand-50 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400'
                       : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100'}
-                    ${sidebarCollapsed && active ? 'border-l-0' : ''}
                   `}
                   title={sidebarCollapsed ? item.label : undefined}
                   aria-current={isActive ? 'page' : undefined}
@@ -136,20 +253,8 @@ export const Layout = ({ children }: { children: ReactNode }) => {
                 </NavLink>
               );
             })}
-          </nav>
 
-          {/* Bottom section - Collapse toggle + Status */}
-          <div className="p-3 border-t border-neutral-100 dark:border-neutral-800 space-y-3">
-            {/* Connection status */}
-            {!sidebarCollapsed && (
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                {apiStatus === 'loading' && <Badge variant="neutral" size="sm" dot>Verificando...</Badge>}
-                {apiStatus === 'ok' && <Badge variant="success" size="sm" dot>API Conectada</Badge>}
-                {apiStatus === 'error' && <Badge variant="danger" size="sm" dot>API Desconectada</Badge>}
-              </div>
-            )}
-
-            {/* Collapse toggle (desktop) / Close (mobile) */}
+            {/* Collapse toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -188,10 +293,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
               </Button>
               <div>
                 <h1 className="text-xl lg:text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
-                  {navItems.find(item =>
-                    location.pathname === item.path ||
-                    (item.path !== '/' && location.pathname.startsWith(item.path))
-                  )?.label || 'Dashboard'}
+                  {currentPageTitle}
                 </h1>
               </div>
             </div>
@@ -234,23 +336,23 @@ export const Layout = ({ children }: { children: ReactNode }) => {
                         <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Usuario Demo</p>
                         <p className="text-xs text-neutral-500">demo@3dprint.local</p>
                       </div>
-                      {userItems.map((item) => (
-                        <button
-                          key={item.label}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
-                          onClick={() => {
-                            setUserMenuOpen(false);
-                            if (item.path) {
-                              navigate(item.path);
-                            } else if (item.action === 'logout') {
-                              // Handle logout
-                            }
-                          }}
-                        >
-                          <item.icon className="h-4 w-4 text-neutral-400" />
-                          <span>{item.label}</span>
-                        </button>
-                      ))}
+                      <button
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          navigate('/settings');
+                        }}
+                      >
+                        <Settings className="h-4 w-4 text-neutral-400" />
+                        <span>Configuración</span>
+                      </button>
+                      <button
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <LogOut className="h-4 w-4 text-neutral-400" />
+                        <span>Cerrar sesión</span>
+                      </button>
                     </div>
                   </>
                 )}
