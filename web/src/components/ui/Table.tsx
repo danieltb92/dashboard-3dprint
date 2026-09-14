@@ -65,7 +65,7 @@ function TableComponent<T>({
         <th
           key={col.key}
           scope="col"
-          className={`pb-3 text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : ''} ${col.headerClassName || ''}`}
+          className={`pb-3 px-5 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider whitespace-nowrap ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : ''} ${col.headerClassName || ''}`}
         >
           {col.header}
         </th>
@@ -81,7 +81,7 @@ function TableComponent<T>({
       {columns.map((col) => (
         <td
           key={col.key}
-          className={`py-4 px-4 text-sm text-neutral-900 dark:text-neutral-100 ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : ''} ${col.className || ''}`}
+          className={`py-3.5 px-5 text-sm text-neutral-900 dark:text-neutral-100 whitespace-nowrap ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : ''} ${col.className || ''}`}
         >
           {col.render ? col.render(row, rowIndex) : String((row as Record<string, unknown>)[col.key] ?? '')}
         </td>

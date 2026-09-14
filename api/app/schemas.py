@@ -58,6 +58,12 @@ class ProductCreate(APIModel):
     foto: str | None = None
     precio_venta_cop: PositiveInt
     activa: bool = True
+    color: str | None = None
+    linea: str | None = None
+    stock_actual: int = 0
+    stock_pedido: int = 0
+    stock_alert: str | None = None
+    status_produccion: str | None = None
 
 
 class ProductUpdate(ProductCreate):
@@ -111,6 +117,8 @@ class CostBreakdown(APIModel):
     electricidad: int
     mano_obra: int
     maquina: int
+    overhead: int
+    subtotal: int
     otros: int
     total_costo: int
     precio_venta_sugerido: int
@@ -173,3 +181,37 @@ class SettingUpdate(APIModel):
 class SettingRead(ORMModel):
     key: str
     value: str
+
+
+class CompanyCreate(APIModel):
+    nombre: NonEmpty
+    logo_url: str | None = None
+    direccion: str | None = None
+    telefono: str | None = None
+    email: str | None = None
+    nit: str | None = None
+    website: str | None = None
+
+
+class CompanyUpdate(CompanyCreate):
+    pass
+
+
+class CompanyRead(CompanyCreate, ORMModel):
+    id: int
+
+
+class ConsumableCreate(APIModel):
+    nombre: NonEmpty
+    costo_unitario: PositiveInt
+    unidad: NonEmpty
+    uso_por_cm2: NonNegativeFloat = 0
+    activo: bool = True
+
+
+class ConsumableUpdate(ConsumableCreate):
+    pass
+
+
+class ConsumableRead(ConsumableCreate, ORMModel):
+    id: int

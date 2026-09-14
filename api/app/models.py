@@ -49,6 +49,12 @@ class Product(Base):
     foto = Column(String, nullable=True)
     precio_venta_cop = Column(Integer)
     activa = Column(Boolean, default=True)
+    color = Column(String, nullable=True)
+    linea = Column(String, nullable=True)
+    stock_actual = Column(Integer, default=0)
+    stock_pedido = Column(Integer, default=0)
+    stock_alert = Column(String, nullable=True)
+    status_produccion = Column(String, nullable=True)
 
 
 class ProductionLot(Base):
@@ -127,4 +133,26 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hash = Column(String)
     role = Column(String)
+    activo = Column(Boolean, default=True)
+
+
+class Company(Base):
+    __tablename__ = "company"
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String)
+    logo_url = Column(String, nullable=True)
+    direccion = Column(String, nullable=True)
+    telefono = Column(String, nullable=True)
+    email = Column(String, nullable=True)
+    nit = Column(String, nullable=True)
+    website = Column(String, nullable=True)
+
+
+class Consumable(Base):
+    __tablename__ = "consumables"
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String)
+    costo_unitario = Column(Integer)
+    unidad = Column(String)
+    uso_por_cm2 = Column(Float, default=0)
     activo = Column(Boolean, default=True)

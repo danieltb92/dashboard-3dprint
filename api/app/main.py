@@ -6,6 +6,8 @@ from .core.config import settings
 from .database import engine
 from .routers import (
     clients,
+    company,
+    consumables,
     lots,
     materials,
     printers,
@@ -33,6 +35,10 @@ app.include_router(lots.router, prefix=f"{api}/lots", tags=["lots"])
 app.include_router(sales.router, prefix=f"{api}/sales", tags=["sales"])
 app.include_router(quotes.router, prefix=f"{api}/quotes", tags=["quotes"])
 app.include_router(clients.router, prefix=f"{api}/clients", tags=["clients"])
+app.include_router(company.router, prefix=f"{api}/company", tags=["company"])
+app.include_router(
+    consumables.router, prefix=f"{api}/consumables", tags=["consumables"]
+)
 app.include_router(settings_router.router, prefix=f"{api}/settings", tags=["settings"])
 
 

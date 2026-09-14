@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart, Boxes, Wrench, Circle } from 'lucide-react';
+import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart, Boxes, Wrench, Circle, Building2, Droplets } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { healthCheck } from '../services/api';
@@ -39,6 +39,13 @@ const navSections: NavSection[] = [
     items: [
       { path: '/impresoras', label: 'Impresoras', icon: Boxes },
       { path: '/materiales', label: 'Materiales', icon: Wrench },
+      { path: '/consumibles', label: 'Consumibles', icon: Droplets },
+    ],
+  },
+  {
+    title: 'Empresa',
+    items: [
+      { path: '/empresa', label: 'Datos Empresa', icon: Building2 },
     ],
   },
 ];
@@ -141,7 +148,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             <img src="/assets/logo.png" alt="Logo" className="h-7 w-7 object-contain" />
             {!sidebarCollapsed && (
               <span className="text-base font-bold text-white whitespace-nowrap tracking-heading">
-                3D Print
+                DCapital.co
               </span>
             )}
           </div>
@@ -272,7 +279,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       </aside>
 
       {/* Main content */}
-      <div className={`lg:ml-60 ${sidebarCollapsed ? 'lg:ml-16' : ''} min-h-screen transition-all duration-200`}>
+      <div className={`transition-all duration-200 ease-out min-h-screen ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'}`}>
         {/* Top Header */}
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">

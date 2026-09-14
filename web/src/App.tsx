@@ -10,6 +10,8 @@ import { Pedidos } from './pages/Pedidos';
 import { Settings } from './pages/Settings';
 import { Printers } from './pages/Printers';
 import { Materials } from './pages/Materials';
+import { Company } from './pages/Company';
+import { Consumables } from './pages/Consumables';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             <Route path="/pedidos" element={<Pedidos />} />
             <Route path="/impresoras" element={<Printers />} />
             <Route path="/materiales" element={<Materials />} />
+            <Route path="/empresa" element={<Company />} />
+            <Route path="/consumibles" element={<Consumables />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Layout>

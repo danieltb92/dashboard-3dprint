@@ -92,16 +92,30 @@ Alembic se configurara antes de la primera instalacion con datos operativos. Mie
 
 ## 5. Plan de implementacion
 
-### Estado de implementacion — 2026-09-08
+### Estado de implementacion — 2026-09-13
 
 Se completó el alcance local de la Fase 1, sin modificar Docker ni el despliegue NAS:
 
 - Los routers de negocio ya se publican bajo `/api`, compatible con el cliente local.
 - Hay contratos Pydantic de creación, actualización y respuesta, con validaciones de referencias y rangos.
-- Se implementaron CRUD de impresoras, materiales, productos y clientes; además de cálculo/registro de lotes y creación/consulta de ventas y cotizaciones.
+- Se implementaron CRUD de impresoras, materiales, productos, clientes, empresa y consumibles; además de cálculo/registro de lotes y creación/consulta de ventas y cotizaciones.
 - `POST /api/lots/calculate` no persiste y `POST /api/lots` guarda el desglose calculado.
 - Alembic quedó configurado con la revisión inicial `20260908_0001`; para una base nueva se usa `alembic upgrade head`.
 - Se añadieron pruebas de API para salud, productos, lotes y cotizaciones. Se ejecutan con `cd api; pytest -q`.
+
+**Actualización 2026-09-13:**
+- Modelo Product expandido con 6 campos de inventario: color, linea, stock_actual, stock_pedido, stock_alert, status_produccion
+- Modelos Company y Consumable con CRUD completo
+- Migraciones: `20260911_0001_add_company_consumables.py`, `20260912_0001_add_product_inventory_fields.py`
+- Motor de costos con 6 factores: filamento, electricidad, mano de obra, maquina, overhead (10% default), otros
+- Rebrand a "DCapital.co" (index.html, sidebar, cotizaciones)
+- Sidebar con colapsado responsive (`w-60` → `w-16`) y contenido main que se adapta
+- Inventario con tabla expandida (10 columnas), filtros por categoría, y stock summary cards
+- Modal de producto reestructurado: header fijo, contenido scrollable, footer siempre visible
+- Company.tsx: configuración de datos empresa (logo, dirección, teléfono, email, NIT)
+- Consumables.tsx: CRUD de consumibles con分类 (Limpieza, Corte, Adhesivos, Herramientas, Otros)
+- Cotizaciones con encabezado de marca (logo, datos empresa, NIT)
+- seed_data.py: 16 productos con datos completos de inventario
 
 Pendiente para cerrar completamente la Fase 1: corregir y validar Docker/persistencia NAS, pruebas de fórmulas con valores de las plantillas CSV y la integración visual completa del frontend.
 
@@ -175,7 +189,47 @@ Estas iniciativas se retomaran una vez validado el flujo principal y el desplieg
 | Circle inicial cliente | Removido círculo con inicial de cliente de todas las páginas (Clientes, Quotes resumen, Quotes form creación, Quotes modal detalle). | Media | Completada |
 | Funcionalidad profesional | Toast notifications (`useToast` context), loading skeletons por página, validación mejorada en forms Quotes/Pedidos. | Baja | Completada |
 | Nomenclatura SKU | Formato `PRD-{categoria}-{secuencia}` (ej: `PRD-BOL-001`). Actualizar `models.py`, `seed_data.py` y routers/forms. | Media | Pendiente |
+| Dashboard redesign | Greeting personalizado con hora del día (Buenos días/tardes/noches), iconos Sun/Moon/Cloud. Nombre dinámico desde `localStorage`. | Alta | Completada |
+| Onboarding checklist | 4 pasos (impresora, material, cotización, calculadora) con barra de progreso y tarjeta de celebración al completar. | Alta | Completada |
+| Activity timeline | Timeline unificado de cotizaciones, lotes y ventas con timestamps relativos. Reemplaza tablas estáticas. | Alta | Completada |
+| Quick actions | 4 atajos (Cotización, Calculadora, Inventario, Clientes) con variación visual: cotización como card principal con gradiente. | Media | Completada |
+| Tips card | Tarjeta de consejos del día con icono Lucide (reemplaza emoji 💡). Copy rotativo. | Baja | Completada |
+| KPI cards heterogéneos | Cotizaciones como card principal (`col-span-2`) con tendencia de aceptadas. Todas con hover `shadow-md`. | Media | Completada |
+| Revenue cards con iconos | Ingresos con `TrendingUp`, Costos con `DollarSign`. Layout `items-start justify-between`. | Baja | Completada |
+| Empty states enriquecidos | Inventory, Clientes, Quotes: icono en círculo, título descriptivo, copy contextual, CTA claro. | Media | Completada |
+| Motion de entrada | Fade-in escalonado (0ms→600ms) en 7 secciones del Dashboard. Keyframes `fadeIn` con translateY. | Baja | Completada |
+| Heading tracking | Clase `.tracking-heading` con `letter-spacing: -0.02em` en títulos grandes. | Baja | Completada |
+| Custom scrollbars | Clase `.scrollbar-thin` aplicada a sidebar y modales con scroll. | Baja | Completada |
+| Browser surfaces | `::selection` con brand colors, `:focus-visible` corregido, `caret-color: brand-500` en inputs. | Baja | Completada |
+| Sidebar dark brand | Sidebar estilo Huzzle: fondo azul oscuro gradiente (`#0a1628`→`#0f2140`), texto blanco, ancho reducido `w-60`. Active `bg-white/15`. Status card integrado. | Alta | Completada |
+| Sidebar collapse responsive | Sidebar colapsable `w-60`→`w-16` con transición. Contenido main se adapta al margin izquierdo. Toggle con ChevronLeft animado. | Alta | Completada |
+| Overhead en motor de costos | Campo `overhead_pct` (default 10%) en calculadora y motor de costos. CostBreakdown incluye `overhead_cop`. | Media | Completada |
+| Modelo Product inventario | 6 campos nuevos: color, linea, stock_actual, stock_pedido, stock_alert, status_produccion. Migración `20260912_0001`. | Alta | Completada |
+| Company model + CRUD | Tabla `company` con logo, dirección, teléfono, email, NIT. Router `/api/company`. Página `Company.tsx`. | Media | Completada |
+| Consumable model + CRUD | Tabla `consumables` con categoría, stock, precio, unidad. Router `/api/consumables`. Página `Consumables.tsx`. | Media | Completada |
+| Branding DCapital.co | Rebrand completo: index.html title, sidebar brand text, encabezado cotizaciones con datos empresa. | Alta | Completada |
+| Inventario tabla expandida | 10 columnas (SKU, Producto, Color, Línea, Stock, Pedido, Alerta, Status, Precio, Estado). Filtros por categoría. Stock summary cards. | Alta | Completada |
+| Modal producto mejorado | Header fijo, contenido scrollable, footer siempre visible con botón submit. Estructura flex en vez de overflow-hidden. | Media | Completada |
 
-## 9. Resultado esperado
+## 10. Resultado esperado
 
 Al finalizar la Fase 1, el proyecto deja de ser un conjunto de pantallas y endpoints de ejemplo y pasa a ser un MVP operativo para registrar configuracion, calcular costos auditables y guardar lotes de produccion. Las fases posteriores agregan inventario y operacion comercial sobre esa base estable.
+
+### UI/UX completado (2026-09-13)
+
+- Dashboard personalizado con greeting, onboarding, timeline, quick actions y tips
+- Sidebar rediseñado con estilo Huzzle (azul oscuro, colapsable, responsive)
+- KPI cards heterogéneos con hover states
+- Motion de entrada escalonado
+- Empty states enriquecidos en Inventory, Clientes y Quotes
+- Browser surfaces polish (selection, focus, caret)
+- Custom scrollbars en sidebar y modales
+- Rebrand a "DCapital.co" en toda la aplicación
+
+### Backend completado (2026-09-13)
+
+- CRUD completo: Printers, Materials, Products, Clients, Company, Consumables
+- Motor de costos con 6 factores (filamento, electricidad, mano de obra, maquina, overhead, otros)
+- Migraciones Alembic para Company/Consumables y Product inventory fields
+- Cotizaciones con encabezado de marca (datos empresa)
+- seed_data.py con 16 productos de inventario

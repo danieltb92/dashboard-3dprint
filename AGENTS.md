@@ -52,15 +52,22 @@ dashboard-3dprint/
 │   │   ├── models.py      # SQLAlchemy models (Printer, Material, Product...)
 │   │   ├── schemas.py     # Pydantic schemas
 │   │   ├── database.py    # SQLite session
+│   │   ├── core/
+│   │   │   └── config.py  # Configuración centralizada
 │   │   ├── services/
 │   │   │   └── cost_engine.py  # Motor de costos (fórmulas verificadas)
-│   │   └── routers/       # CRUD endpoints
+│   │   └── routers/       # CRUD endpoints (clients, lots, materials, printers, products, quotes, sales, settings)
+│   ├── tests/             # Pruebas API (conftest.py, test_api.py)
+│   ├── alembic/           # Migraciones de BD
 │   ├── requirements.txt
 │   └── seed_data.py       # Script para datos de ejemplo
 │
 ├── web/                   # Frontend React
 │   ├── src/
-│   │   ├── pages/         # Calculator, Inventory, Quotes
+│   │   ├── components/
+│   │   │   ├── Layout.tsx # Sidebar + layout principal (colapsable)
+│   │   │   └── ui/        # Componentes reutilizables (Badge, Button, Card, Input, Select, Skeleton, Table, Toast)
+│   │   ├── pages/         # Calculator, Clientes, Company, Consumables, Dashboard, Inventory, Materials, Pedidos, Printers, Quotes, Settings
 │   │   ├── services/
 │   │   │   └── api.ts     # Axios client (apunta a :8000)
 │   │   └── App.tsx        # Router principal
@@ -106,14 +113,20 @@ dashboard-3dprint/
    - Electricidad: `(watts / 1000) × horas × cop_kwh`
    - Máquina: `precio_impresora × (1 + reparaciones%) / vida_util_horas × horas`
    - Mano de obra: `(min_prep + min_post) / 60 × labor_rate_cop`
+   - Overhead: `subtotal × overhead_pct / 100` (default 10%)
 
 4. **Settings**: Se almacenan en tabla `settings` como key-value. Valores por defecto:
    - `cop_kwh=839`
    - `iva_pct=19`
    - `labor_rate_cop=6470`
    - `margen_default=100`
+   - `overhead_pct=10`
 
-5. **Migraciones Alembic**: La revisión inicial es `20260908_0001`. Todo cambio de esquema requiere una nueva revisión Alembic; no recrear la base de datos como mecanismo de migración.
+5. **Migraciones Alembic**: La revisión inicial es `20260908_0001`. Revisiones adicionales:
+   - `20260909_0001_expand_client_fields.py` — Campos expandidos de clientes
+   - `20260909_0002_add_client_codigo.py` — Código de cliente (CLI-001)
+   - `20260911_0001_add_company_consumables.py` — Tablas Company y Consumable
+   - `20260912_0001_add_product_inventory_fields.py` — 6 campos de inventario en Product
 
 6. **Pruebas backend**: Ejecutar `cd api; pytest -q`. Las pruebas usan una base SQLite temporal aislada y no deben apuntar a `data/app.db`.
 

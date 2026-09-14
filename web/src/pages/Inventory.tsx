@@ -4,7 +4,7 @@ import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
-import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
+import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Table, createColumns } from '../components/ui/Table';
 import api from '../services/api';
@@ -17,6 +17,12 @@ interface Product {
   categoria: string;
   precio_venta_cop: number;
   activa: boolean;
+  color: string | null;
+  linea: string | null;
+  stock_actual: number;
+  stock_pedido: number;
+  stock_alert: string | null;
+  status_produccion: string | null;
 }
 
 interface ProductFormData {
@@ -25,9 +31,19 @@ interface ProductFormData {
   categoria: string;
   precio_venta_cop: string;
   activa: boolean;
+  color: string;
+  linea: string;
+  stock_actual: string;
+  stock_pedido: string;
+  stock_alert: string;
+  status_produccion: string;
 }
 
-const categories = ['Llaveros', 'Tags', 'Accesorios', 'Organizadores', 'Otros'] as const;
+const categories = ['Llaveros', 'Tags', 'Accesorios', 'Organizadores', 'Pedidos Especiales', 'Internos', 'Otros'] as const;
+const colors = ['Blanco', 'Negro', 'Natural', 'Negro-Azul', 'Bicolor', 'Otro'] as const;
+const lines = ['Accesorio', 'Pedido Especial', 'Interna', 'Personalizado'] as const;
+const stockAlerts = ['In Stock', 'Out of Stock', 'Low in Stock', 'Descontinuado'] as const;
+const productionStatuses = ['Backorder', 'Need to Order', 'Pendiente', 'Stand by', 'Completado'] as const;
 
 // Icon constants
 const ICON_PACKAGE = <Package className="h-6 w-6 text-brand-600 dark:text-brand-400" />;
@@ -42,6 +58,10 @@ const ICON_X = <X className="h-5 w-5" />;
 const ICON_DOLLAR = <span className="text-neutral-400 dark:text-neutral-500">$</span>;
 
 const CATEGORY_OPTIONS = categories.map(c => ({ value: c, label: c }));
+const COLOR_OPTIONS = colors.map(c => ({ value: c, label: c }));
+const LINE_OPTIONS = lines.map(l => ({ value: l, label: l }));
+const STOCK_ALERT_OPTIONS = stockAlerts.map(s => ({ value: s, label: s }));
+const PRODUCTION_STATUS_OPTIONS = productionStatuses.map(p => ({ value: p, label: p }));
 
 export const Inventory = () => {
   const toast = useToast();
@@ -55,6 +75,12 @@ export const Inventory = () => {
     categoria: '',
     precio_venta_cop: '',
     activa: true,
+    color: '',
+    linea: '',
+    stock_actual: '0',
+    stock_pedido: '0',
+    stock_alert: '',
+    status_produccion: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -120,6 +146,12 @@ export const Inventory = () => {
       const payload = {
         ...formData,
         precio_venta_cop: parseFloat(formData.precio_venta_cop),
+        stock_actual: parseInt(formData.stock_actual) || 0,
+        stock_pedido: parseInt(formData.stock_pedido) || 0,
+        color: formData.color || null,
+        linea: formData.linea || null,
+        stock_alert: formData.stock_alert || null,
+        status_produccion: formData.status_produccion || null,
       };
 
       if (editingProduct) {
@@ -148,6 +180,12 @@ export const Inventory = () => {
       categoria: product.categoria,
       precio_venta_cop: String(product.precio_venta_cop),
       activa: product.activa,
+      color: product.color || '',
+      linea: product.linea || '',
+      stock_actual: String(product.stock_actual),
+      stock_pedido: String(product.stock_pedido),
+      stock_alert: product.stock_alert || '',
+      status_produccion: product.status_produccion || '',
     });
     setShowModal(true);
   }, []);
@@ -170,6 +208,12 @@ export const Inventory = () => {
       categoria: '',
       precio_venta_cop: '',
       activa: true,
+      color: '',
+      linea: '',
+      stock_actual: '0',
+      stock_pedido: '0',
+      stock_alert: '',
+      status_produccion: '',
     });
     setErrors({});
   }, []);
@@ -199,29 +243,109 @@ export const Inventory = () => {
       key: 'sku',
       header: 'SKU',
       render: (product) => (
-        <span className="font-mono text-sm text-neutral-900 dark:text-neutral-100">{product.sku}</span>
+        <span className="font-mono text-xs text-neutral-500 dark:text-neutral-400">{product.sku}</span>
       ),
     },
     {
       key: 'nombre',
       header: 'Producto',
       render: (product) => (
-        <span className="font-medium text-neutral-900 dark:text-neutral-100">{product.nombre}</span>
+        <span className="font-medium text-neutral-900 dark:text-neutral-100 truncate max-w-[180px] block">{product.nombre}</span>
       ),
     },
     {
-      key: 'categoria',
-      header: 'Categoría',
+      key: 'color',
+      header: 'Color',
       render: (product) => (
-        <Badge variant="brand" size="sm">{product.categoria}</Badge>
+        product.color ? (
+          <Badge variant="neutral" size="sm">{product.color}</Badge>
+        ) : (
+          <span className="text-neutral-300 dark:text-neutral-600">—</span>
+        )
+      ),
+    },
+    {
+      key: 'linea',
+      header: 'Línea',
+      render: (product) => (
+        product.linea ? (
+          <Badge variant="brand" size="sm">{product.linea}</Badge>
+        ) : (
+          <span className="text-neutral-300 dark:text-neutral-600">—</span>
+        )
+      ),
+    },
+    {
+      key: 'stock_actual',
+      header: 'Stock',
+      align: 'center' as const,
+      render: (product) => {
+        const actual = product.stock_actual;
+        const stockColor = actual <= 0
+          ? 'text-danger-600 dark:text-danger-400'
+          : actual <= 2
+            ? 'text-warning-600 dark:text-warning-400'
+            : 'text-success-600 dark:text-success-400';
+        return (
+          <span className={`font-mono font-semibold text-sm ${stockColor}`}>{actual}</span>
+        );
+      },
+    },
+    {
+      key: 'stock_pedido',
+      header: 'Pedido',
+      align: 'center' as const,
+      render: (product) => (
+        <span className="font-mono text-sm text-neutral-600 dark:text-neutral-400">{product.stock_pedido}</span>
+      ),
+    },
+    {
+      key: 'stock_alert',
+      header: 'Alerta',
+      align: 'center' as const,
+      render: (product) => (
+        product.stock_alert ? (
+          <Badge
+            variant={
+              product.stock_alert === 'In Stock' ? 'success' :
+              product.stock_alert === 'Out of Stock' ? 'danger' :
+              product.stock_alert === 'Low in Stock' ? 'warning' : 'neutral'
+            }
+            size="sm"
+          >
+            {product.stock_alert}
+          </Badge>
+        ) : (
+          <span className="text-neutral-300 dark:text-neutral-600">—</span>
+        )
+      ),
+    },
+    {
+      key: 'status_produccion',
+      header: 'Status',
+      render: (product) => (
+        product.status_produccion ? (
+          <Badge
+            variant={
+              product.status_produccion === 'Completado' ? 'success' :
+              product.status_produccion === 'Backorder' ? 'warning' :
+              product.status_produccion === 'Need to Order' ? 'danger' : 'neutral'
+            }
+            size="sm"
+          >
+            {product.status_produccion}
+          </Badge>
+        ) : (
+          <span className="text-neutral-300 dark:text-neutral-600">—</span>
+        )
       ),
     },
     {
       key: 'precio_venta_cop',
-      header: 'Precio Venta',
+      header: 'Precio',
       align: 'right' as const,
       render: (product) => (
-        <span className="font-mono font-medium text-neutral-900 dark:text-neutral-100 cop-amount">{formatCOP(product.precio_venta_cop)}</span>
+        <span className="font-mono font-medium text-sm text-neutral-900 dark:text-neutral-100">{formatCOP(product.precio_venta_cop)}</span>
       ),
     },
     {
@@ -236,28 +360,24 @@ export const Inventory = () => {
     },
     {
       key: 'actions',
-      header: 'Acciones',
+      header: '',
       align: 'right' as const,
       render: (product) => (
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={ICON_EDIT}
+        <div className="flex items-center justify-end gap-1">
+          <button
             onClick={() => handleEdit(product)}
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:text-brand-400 dark:hover:bg-brand-500/10 transition-colors"
             aria-label={`Editar ${product.nombre}`}
           >
-            Editar
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            leftIcon={ICON_TRASH}
+            {ICON_EDIT}
+          </button>
+          <button
             onClick={() => handleDelete(product.id)}
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-danger-600 hover:bg-danger-50 dark:hover:text-danger-400 dark:hover:bg-danger-500/10 transition-colors"
             aria-label={`Eliminar ${product.nombre}`}
           >
-            Eliminar
-          </Button>
+            {ICON_TRASH}
+          </button>
         </div>
       ),
     },
@@ -289,56 +409,62 @@ export const Inventory = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
             {ICON_PACKAGE}
           </div>
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">Inventario de Productos</h1>
-            <p className="text-neutral-500 dark:text-neutral-400 mt-0.5">Gestiona tu catálogo de productos y stock</p>
+            <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tracking-heading">Inventario</h1>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">{products.length} productos registrados</p>
           </div>
         </div>
-        <Button onClick={openNewModal} size="lg" leftIcon={ICON_PLUS}>
+        <Button onClick={openNewModal} leftIcon={ICON_PLUS}>
           Nuevo Producto
         </Button>
       </div>
 
+      {/* Stock Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3">
+          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Total Productos</p>
+          <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mt-1">{products.length}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3">
+          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">En Stock</p>
+          <p className="text-2xl font-bold text-success-600 dark:text-success-400 mt-1">{products.filter(p => p.stock_actual > 0).length}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3">
+          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Stock Bajo</p>
+          <p className="text-2xl font-bold text-warning-600 dark:text-warning-400 mt-1">{products.filter(p => p.stock_actual >= 0 && p.stock_actual <= 2).length}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3">
+          <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Sin Stock</p>
+          <p className="text-2xl font-bold text-danger-600 dark:text-danger-400 mt-1">{products.filter(p => p.stock_actual <= 0).length}</p>
+        </div>
+      </div>
+
       {/* Search & Filter */}
-      <Card className="p-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none">
-                {ICON_SEARCH}
-              </div>
-              <Input
-                placeholder="Buscar por SKU o nombre..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10"
-                leftIcon={null}
-              />
-            </div>
-            {categoryFilter && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleCategoryFilterChange('')}
-                leftIcon={<X className="h-3.5 w-3.5" />}
-                className="text-neutral-500 dark:text-neutral-400 hover:text-danger-600 dark:hover:text-danger-400"
-              >
-                Limpiar filtro
-              </Button>
-            )}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none">
+            {ICON_SEARCH}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Filter className="h-4 w-4 text-neutral-400 dark:text-neutral-500" aria-hidden="true" />
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">Categoría:</span>
+          <Input
+            placeholder="Buscar por SKU o nombre..."
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="pl-10"
+            leftIcon={null}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-neutral-400 dark:text-neutral-500" aria-hidden="true" />
+          <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => handleCategoryFilterChange('')}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 !categoryFilter
-                  ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 ring-1 ring-brand-300 dark:ring-brand-500/40'
-                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200'
+                  ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400'
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
               }`}
             >
               Todas
@@ -347,10 +473,10 @@ export const Inventory = () => {
               <button
                 key={cat}
                 onClick={() => handleCategoryFilterChange(categoryFilter === cat ? '' : cat)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   categoryFilter === cat
-                    ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 ring-1 ring-brand-300 dark:ring-brand-500/40'
-                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200'
+                    ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 }`}
               >
                 {cat}
@@ -358,14 +484,10 @@ export const Inventory = () => {
             ))}
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Products Table */}
       <Card>
-        <CardHeader
-          title={`Productos (${filteredProducts.length}/${products.length})`}
-          subtitle="Lista completa del catálogo"
-        />
         <CardContent className="p-0">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12 px-6">
@@ -401,9 +523,9 @@ export const Inventory = () => {
       {/* New/Edit Product Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { e.stopPropagation(); handleModalClose(); }}>
-          <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+          <Card className="w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
             <CardHeader
-              className="border-b border-neutral-100 dark:border-neutral-800 sticky top-0 bg-white dark:bg-neutral-900 z-10"
+              className="border-b border-neutral-100 dark:border-neutral-800 shrink-0"
               title={editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
               subtitle={editingProduct ? `SKU: ${editingProduct.sku}` : 'Completa la información del producto'}
               action={
@@ -412,8 +534,8 @@ export const Inventory = () => {
                 </Button>
               }
             />
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <CardContent className="p-6 overflow-y-auto flex-1 min-h-0">
+              <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Input
                   label="SKU"
@@ -444,18 +566,78 @@ export const Inventory = () => {
                 placeholder="Ej: Llavero personalizado 3D"
               />
 
-              <Input
-                label="Precio de venta (COP)"
-                type="number"
-                name="precio_venta_cop"
-                value={formData.precio_venta_cop}
-                onChange={handleChange}
-                error={errors.precio_venta_cop}
-                min={1}
-                step={1}
-                placeholder="Ej: 15000"
-                leftIcon={ICON_DOLLAR}
-              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Select
+                  label="Color"
+                  options={COLOR_OPTIONS}
+                  placeholder="Selecciona color"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleChange}
+                />
+                <Select
+                  label="Línea"
+                  options={LINE_OPTIONS}
+                  placeholder="Selecciona línea"
+                  name="linea"
+                  value={formData.linea}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Input
+                  label="Stock Actual"
+                  type="number"
+                  name="stock_actual"
+                  value={formData.stock_actual}
+                  onChange={handleChange}
+                  min={0}
+                  step={1}
+                  placeholder="0"
+                />
+                <Input
+                  label="Stock Pedido"
+                  type="number"
+                  name="stock_pedido"
+                  value={formData.stock_pedido}
+                  onChange={handleChange}
+                  min={0}
+                  step={1}
+                  placeholder="0"
+                />
+                <Input
+                  label="Precio de venta (COP)"
+                  type="number"
+                  name="precio_venta_cop"
+                  value={formData.precio_venta_cop}
+                  onChange={handleChange}
+                  error={errors.precio_venta_cop}
+                  min={1}
+                  step={1}
+                  placeholder="Ej: 15000"
+                  leftIcon={ICON_DOLLAR}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Select
+                  label="Alerta Stock"
+                  options={STOCK_ALERT_OPTIONS}
+                  placeholder="Selecciona alerta"
+                  name="stock_alert"
+                  value={formData.stock_alert}
+                  onChange={handleChange}
+                />
+                <Select
+                  label="Status Producción"
+                  options={PRODUCTION_STATUS_OPTIONS}
+                  placeholder="Selecciona status"
+                  name="status_produccion"
+                  value={formData.status_produccion}
+                  onChange={handleChange}
+                />
+              </div>
 
               <div className="flex items-center gap-3">
                 <input
@@ -470,8 +652,10 @@ export const Inventory = () => {
                   Producto activo (visible en cotizaciones)
                 </label>
               </div>
-
-              <CardFooter className="border-t border-neutral-100 dark:border-neutral-800 pt-4">
+            </form>
+            </CardContent>
+            <div className="border-t border-neutral-100 dark:border-neutral-800 px-6 py-4 shrink-0">
+              <div className="flex gap-3">
                 <Button
                   variant="outline"
                   type="button"
@@ -482,14 +666,14 @@ export const Inventory = () => {
                 </Button>
                 <Button
                   type="submit"
+                  form="product-form"
                   isLoading={loading}
                   className="flex-1"
                 >
                   {editingProduct ? 'Actualizar' : 'Crear Producto'}
                 </Button>
-              </CardFooter>
-            </form>
-            </CardContent>
+              </div>
+            </div>
           </Card>
         </div>
       )}

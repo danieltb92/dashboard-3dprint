@@ -25,6 +25,7 @@ def get_cost_settings(db: Session) -> dict[str, int | float]:
         "margen_default": int(
             saved.get("margen_default", app_settings.default_margin_pct)
         ),
+        "overhead_pct": int(saved.get("overhead_pct", 10)),
     }
 
 

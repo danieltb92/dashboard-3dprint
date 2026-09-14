@@ -45,14 +45,19 @@ def calculate_production_cost(
         / Decimal(str(printer.vida_util_horas))
         * hours
     )
-    total = filament + electricity + labor + machine + Decimal(extras_cost)
+    subtotal = filament + electricity + labor + machine
+    overhead_pct = Decimal(str(settings.get("overhead_pct", 0)))
+    overhead = subtotal * overhead_pct / 100
+    total = subtotal + overhead + Decimal(extras_cost)
     total_cop = _cop(total)
     return {
         "filamento": _cop(filament),
         "electricidad": _cop(electricity),
         "mano_obra": _cop(labor),
         "maquina": _cop(machine),
+        "overhead": _cop(overhead),
         "otros": extras_cost,
+        "subtotal": _cop(subtotal),
         "total_costo": total_cop,
         "precio_venta_sugerido": _cop(
             total * (Decimal("1") + Decimal(str(settings["margen_default"])) / 100)

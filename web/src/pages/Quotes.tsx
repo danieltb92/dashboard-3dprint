@@ -24,6 +24,17 @@ interface Client {
   contacto: string;
 }
 
+interface CompanyData {
+  id?: number;
+  nombre: string;
+  logo_url: string;
+  direccion: string;
+  telefono: string;
+  email: string;
+  nit: string;
+  website: string;
+}
+
 interface QuoteLine {
   id: number;
   product_id: number | null;
@@ -110,18 +121,23 @@ export const Quotes = () => {
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [acceptingQuote, setAcceptingQuote] = useState<any>(null);
   const [stockCheck, setStockCheck] = useState<{ has_stock: boolean; lines: any[] } | null>(null);
+  const [company, setCompany] = useState<CompanyData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsResp, clientsResp, quotesResp] = await Promise.all([
+        const [productsResp, clientsResp, quotesResp, companyResp] = await Promise.all([
           api.get('/products/?activa=true'),
           api.get('/clients/'),
           api.get('/quotes/'),
+          api.get('/company/').catch(() => ({ data: [] })),
         ]);
         setProducts(productsResp.data);
         setClients(clientsResp.data);
         setQuotes(quotesResp.data);
+        if (companyResp.data.length > 0) {
+          setCompany(companyResp.data[0]);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -1047,10 +1063,17 @@ export const Quotes = () => {
                 <div className="px-8 pt-6 pb-4 border-b border-neutral-200 dark:border-neutral-700">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-3xl">🖨️</span>
+                      {company?.logo_url ? (
+                        <img src={company.logo_url} alt="Logo" className="h-10 w-10 object-contain" />
+                      ) : (
+                        <img src="/assets/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
+                      )}
                       <div>
-                        <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">3D Print Dashboard</h2>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400">Impresión 3D bajo demanda</p>
+                        <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">{company?.nombre || 'DCapital.co'}</h2>
+                        {company?.direccion && <p className="text-xs text-neutral-500 dark:text-neutral-400">{company.direccion}</p>}
+                        {company?.telefono && <p className="text-xs text-neutral-500 dark:text-neutral-400">{company.telefono}</p>}
+                        {company?.email && <p className="text-xs text-neutral-500 dark:text-neutral-400">{company.email}</p>}
+                        {company?.nit && <p className="text-xs text-neutral-500 dark:text-neutral-400">NIT: {company.nit}</p>}
                       </div>
                     </div>
                     <div className="text-right">

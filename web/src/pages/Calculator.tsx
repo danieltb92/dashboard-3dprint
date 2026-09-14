@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calculator as CalculatorIcon, Save, FileSpreadsheet, RefreshCw, Info, CheckCircle } from 'lucide-react';
+import { Calculator as CalculatorIcon, Save, FileSpreadsheet, RefreshCw, Info, CheckCircle, Clock, Timer, Scale, Zap, HardHat, Wrench, Package, Percent } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -30,6 +30,8 @@ interface CalculationResult {
   electricidad: number;
   mano_obra: number;
   maquina: number;
+  overhead: number;
+  subtotal: number;
   otros: number;
   total_costo: number;
   precio_venta_sugerido: number;
@@ -45,20 +47,22 @@ const ICON_REFRESH = <RefreshCw className="h-4 w-4" />;
 const ICON_INFO = <Info className="h-4 w-4" />;
 const ICON_CHECK = <CheckCircle className="h-4 w-4" />;
 const ICON_HASH = <span className="text-neutral-400 dark:text-neutral-500">#</span>;
-const ICON_CLOCK = <span className="text-neutral-400 dark:text-neutral-500">🕐</span>;
-const ICON_TIMER = <span className="text-neutral-400 dark:text-neutral-500">⏱</span>;
-const ICON_SCALE = <span className="text-neutral-400 dark:text-neutral-500">⚖️</span>;
-const ICON_THREAD = '🧵';
-const ICON_LIGHTNING = '⚡';
-const ICON_WORKER = '👷';
-const ICON_TOOLS = '🔧';
-const ICON_BOX = '📦';
+const ICON_CLOCK = <Clock className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />;
+const ICON_TIMER = <Timer className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />;
+const ICON_SCALE = <Scale className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />;
+const ICON_THREAD = <Package className="h-4 w-4" />;
+const ICON_LIGHTNING = <Zap className="h-4 w-4" />;
+const ICON_WORKER = <HardHat className="h-4 w-4" />;
+const ICON_TOOLS = <Wrench className="h-4 w-4" />;
+const ICON_BOX = <Package className="h-4 w-4" />;
+const ICON_PERCENT = <Percent className="h-4 w-4" />;
 
 const COST_ITEMS = [
   { key: 'filamento', label: 'Filamento', icon: ICON_THREAD, color: 'brand' },
   { key: 'electricidad', label: 'Electricidad', icon: ICON_LIGHTNING, color: 'warning' },
   { key: 'mano_obra', label: 'Mano de obra', icon: ICON_WORKER, color: 'info' },
   { key: 'maquina', label: 'Máquina + Mantenimiento', icon: ICON_TOOLS, color: 'success' },
+  { key: 'overhead', label: 'Overhead', icon: ICON_PERCENT, color: 'neutral' },
   { key: 'otros', label: 'Otros gastos', icon: ICON_BOX, color: 'neutral' },
 ] as const;
 
