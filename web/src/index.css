@@ -159,6 +159,27 @@
   --z-index-popover:  600;
   --z-index-tooltip:  700;
   --z-index-toast:    800;
+
+  /* shadcn alias → custom palette */
+  --color-primary: var(--color-brand-600);
+  --color-primary-foreground: var(--color-neutral-0);
+  --color-secondary: var(--color-neutral-100);
+  --color-secondary-foreground: var(--color-neutral-900);
+  --color-background: var(--color-surface-bg);
+  --color-foreground: var(--color-text-primary);
+  --color-muted: var(--color-neutral-100);
+  --color-muted-foreground: var(--color-text-secondary);
+  --color-accent: var(--color-neutral-100);
+  --color-accent-foreground: var(--color-neutral-900);
+  --color-border: var(--color-surface-border);
+  --color-input: var(--color-surface-border);
+  --color-ring: var(--color-brand-500);
+  --color-card: var(--color-surface-card);
+  --color-card-foreground: var(--color-text-primary);
+  --color-destructive: var(--color-danger-600);
+  --color-destructive-foreground: var(--color-neutral-0);
+  --color-popover: var(--color-surface-card);
+  --color-popover-foreground: var(--color-text-primary);
 }
 
 @layer base {
@@ -398,6 +419,10 @@
     --color-text-tertiary: var(--color-neutral-500);
     --color-text-inverse: var(--color-neutral-900);
     --color-text-brand: var(--color-brand-400);
+    --color-secondary: var(--color-neutral-800);
+    --color-secondary-foreground: var(--color-neutral-100);
+    --color-accent: var(--color-neutral-800);
+    --color-accent-foreground: var(--color-neutral-100);
   }
 
   .dark body {
