@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Package, Filter } from 'lucide-react';
-import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Card, CardHeader, CardContent } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Table, createColumns } from '../components/ui/Table';
+import { Skeleton, SkeletonTable } from '../components/ui/skeleton';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Card, CardHeader, CardContent } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Table, createColumns } from '../components/ui/table';
 import api from '../services/api';
-import { useToast } from '../components/ui/Toast';
+import { toast } from "sonner";
 
 interface Product {
   id: number;
@@ -64,7 +64,7 @@ const STOCK_ALERT_OPTIONS = stockAlerts.map(s => ({ value: s, label: s }));
 const PRODUCTION_STATUS_OPTIONS = productionStatuses.map(p => ({ value: p, label: p }));
 
 export const Inventory = () => {
-  const toast = useToast();
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -453,7 +453,7 @@ export const Inventory = () => {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
-            leftIcon={null}
+            
           />
         </div>
         <div className="flex items-center gap-2">

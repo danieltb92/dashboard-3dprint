@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Trash2, FileText, UserPlus, X, DollarSign, Calculator, Printer, Share2, Copy, CheckCircle, Send, FileEdit, MessageSquare, MapPin, Phone, Mail, Building2, Package } from 'lucide-react';
-import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Table } from '../components/ui/Table';
+import { Skeleton, SkeletonTable } from '../components/ui/skeleton';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Table } from '../components/ui/table';
 import api from '../services/api';
-import { useToast } from '../components/ui/Toast';
+import { toast } from "sonner";
 
 interface Product {
   id: number;
@@ -83,7 +83,7 @@ const ICON_FILE_TEXT_SM = <FileText className="h-6 w-6 text-brand-600" />;
 const ICON_PACKAGE = <Package className="h-4 w-4" />;
 
 export const Quotes = () => {
-  const toast = useToast();
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);

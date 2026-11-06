@@ -5,8 +5,19 @@ Ejecutar desde la carpeta api/ con el venv activado:
     python seed_data.py
 """
 
+from sqlalchemy import text
 from app.database import SessionLocal, engine
-from app.models import Base, Printer, Material, Setting, Product, Client
+from app.models import (
+    Base,
+    Printer,
+    Material,
+    Setting,
+    Product,
+    Client,
+    Sale,
+    Quote,
+    ProductionLot,
+)
 import sys
 
 
@@ -20,11 +31,16 @@ def seed_database():
         # Verificar si ya hay datos
         if db.query(Printer).count() > 0:
             print("[!] La base de datos ya tiene datos. Limpiando...")
+            db.execute(text("PRAGMA foreign_keys = OFF;"))
+            db.query(ProductionLot).delete()
+            db.query(Sale).delete()
+            db.query(Quote).delete()
             db.query(Printer).delete()
             db.query(Material).delete()
             db.query(Setting).delete()
             db.query(Product).delete()
             db.query(Client).delete()
+            db.execute(text("PRAGMA foreign_keys = ON;"))
             db.commit()
 
         print("[*] Creando datos de ejemplo...\n")

@@ -17,7 +17,7 @@ Elimina la incertidumbre en el costo real de cada pieza impresa. Une cálculo de
 5. **Consumibles** — CRUD de consumibles del taller (limpieza, corte, adhesivos, herramientas, otros) → control de stock
 
 ## Technical Constraints
-- **Stack:** React 19 + Vite 6 + TypeScript + Tailwind CSS 4 + pnpm
+- **Stack:** React 19 + Vite 6 + TypeScript + Tailwind CSS 4 + shadcn/ui + Radix UI + CVA + pnpm
 - **Backend:** FastAPI en `:8000` (CORS configurado)
 - **Datos:** COP enteros (sin decimales), horas/gramos con 2 decimales
 - **Deploy:** Docker Compose para OMV NAS

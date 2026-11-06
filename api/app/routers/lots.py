@@ -66,10 +66,16 @@ def create_lot(payload: ProductionLotCreate, db: Session = Depends(get_db)):
     breakdown = calculate(payload, db)
     minutes = float(payload.minutos)
     item = ProductionLot(
-        **payload.model_dump(),
+        product_id=payload.product_id,
+        printer_id=payload.printer_id,
+        material_id=payload.material_id,
+        qty=payload.qty,
+        minutos=payload.minutos,
+        peso_g=payload.peso_g,
         horas=minutes / 60,
         desglose_json=breakdown,
         costo_unitario_cop=breakdown["total_costo"] // payload.qty,
         costo_total_cop=breakdown["total_costo"],
+        notas=payload.notas,
     )
     return commit(db, item)

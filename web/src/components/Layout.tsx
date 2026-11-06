@@ -1,8 +1,8 @@
 import { ReactNode, useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronLeft, Printer, Package, FileText, LayoutDashboard, Settings, Moon, Sun, User, LogOut, ChevronDown, Users, ShoppingCart, Boxes, Wrench, Circle, Building2, Droplets } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Badge } from './ui/Badge';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { healthCheck } from '../services/api';
 
 interface NavItem {

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Settings as SettingsIcon, Save, Zap, Percent, DollarSign, TrendingUp, BarChart3, Clock } from 'lucide-react';
-import { Skeleton } from '../components/ui/Skeleton';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
+import { Skeleton } from '../components/ui/skeleton';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/card';
 import api from '../services/api';
-import { useToast } from '../components/ui/Toast';
+import { toast } from "sonner";
 
 interface Setting {
   key: string;
@@ -30,7 +30,7 @@ const SECTION_LABELS: Record<string, { title: string; description: string }> = {
 const ICON_SETTINGS = <SettingsIcon className="h-6 w-6 text-brand-600" />;
 
 export const Settings = () => {
-  const toast = useToast();
+  
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

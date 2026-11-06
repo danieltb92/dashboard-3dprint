@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Package } from 'lucide-react';
-import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Card, CardHeader, CardContent } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Table } from '../components/ui/Table';
+import { Skeleton, SkeletonTable } from '../components/ui/skeleton';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Card, CardHeader, CardContent } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Table } from '../components/ui/table';
 import api from '../services/api';
-import { useToast } from '../components/ui/Toast';
+import { toast } from "sonner";
 
 interface MaterialItem {
   id: number;
@@ -40,7 +40,7 @@ const formatCOP = (value: number) => new Intl.NumberFormat('es-CO', {
 }).format(value);
 
 export const Materials = () => {
-  const toast = useToast();
+  
   const [materials, setMaterials] = useState<MaterialItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -196,7 +196,7 @@ export const Materials = () => {
       <Card className="p-4">
         <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none">{ICON_SEARCH}</div>
-          <Input placeholder="Buscar por nombre o tipo..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" leftIcon={null} />
+          <Input placeholder="Buscar por nombre o tipo..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10"  />
         </div>
       </Card>
 

@@ -5,7 +5,7 @@ Guía rápida para agentes trabajando en el dashboard de impresión 3D.
 ## Stack
 
 - **Backend**: FastAPI + SQLAlchemy + SQLite
-- **Frontend**: React 19 + Vite 6 + TypeScript + Tailwind CSS 4 + pnpm
+- **Frontend**: React 19 + Vite 6 + TypeScript + Tailwind CSS 4 + shadcn/ui (New York) + Radix UI + CVA + pnpm
 - **Deploy**: Docker Compose (para OMV NAS)
 - **Dev**: Sin Docker (ver DEV-LOCAL.md)
 
@@ -34,7 +34,7 @@ npx pnpm dev  # Evita problemas de ExecutionPolicy en Windows
 ```
 
 - Backend: http://localhost:8000 (docs: /docs; negocio: /api/*)
-- Frontend: http://localhost:5173
+- Frontend: http://localhost:5173 (si está ocupado, Vite usa http://localhost:5174)
 
 ### Deploy (Docker en NAS OMV)
 
@@ -66,7 +66,7 @@ dashboard-3dprint/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── Layout.tsx # Sidebar + layout principal (colapsable)
-│   │   │   └── ui/        # Componentes reutilizables (Badge, Button, Card, Input, Select, Skeleton, Table, Toast)
+│   │   │   └── ui/        # shadcn/ui adaptado: button, input, select, card, badge, table, skeleton, sonner + index.ts
 │   │   ├── pages/         # Calculator, Clientes, Company, Consumables, Dashboard, Inventory, Materials, Pedidos, Printers, Quotes, Settings
 │   │   ├── services/
 │   │   │   └── api.ts     # Axios client (apunta a :8000)
@@ -97,6 +97,12 @@ dashboard-3dprint/
 
 4. **Tailwind CSS 4.x**: Usa `@tailwindcss/postcss`. No hay `tailwind.config.js` tradicional para v4.
 
+5. **shadcn con API compatible**: Los componentes `ui/` son shadcn adaptado, no puros. `Input` acepta `label`, `error`, `helperText`, `leftIcon`, `rightIcon`; `Table` acepta `columns`, `data`, `keyExtractor`, `emptyMessage`, `emptyAction`, `striped`, `hoverable`. Al actualizar con `npx shadcn add`, revisar que no se pierdan estos wrappers.
+
+6. **Nombres de archivo**: Los componentes UI usan minúsculas (`button.tsx`), pero se exportan en mayúsculas vía `ui/index.ts`. Importar desde `../components/ui/<archivo>`.
+
+7. **Notificaciones**: Usar `import { toast } from 'sonner'` directamente. `useToast` quedó como compatibilidad en `ui/sonner.tsx`, pero no es el patrón nuevo.
+
 ### Backend
 
 1. **Base de datos y migraciones**: SQLite en `data/app.db`. Antes de iniciar o trabajar con una base nueva, aplicar el esquema con:
@@ -104,7 +110,7 @@ dashboard-3dprint/
    cd api
    alembic upgrade head
    ```
-   `seed_data.py` es opcional y exclusivamente para datos de ejemplo; no ejecutarlo contra datos que se quieran conservar.
+   `seed_data.py` es opcional y exclusivamente para datos de ejemplo; no ejecutarlo contra datos que se quieran conservar. Al repoblar una base existente borra tablas dependientes y desactiva temporalmente las foreign keys; aun así no usar contra datos reales.
 
 2. **Montos en COP**: Todos los precios son **enteros** (sin decimales), en pesos colombianos. Las horas/gramos usan `Float` con 2 decimales.
 
@@ -133,6 +139,7 @@ dashboard-3dprint/
 ### Problemas conocidos
 
 - **PowerShell ExecutionPolicy**: Windows bloquea scripts `.ps1` de npm/pnpm. Usar `.cmd` directamente o `npx`.
+- **Puerto de Vite**: Si `5173` está ocupado, Vite arranca en `5174`; el backend debe tener ambos orígenes en `CORS_ORIGINS` o las peticiones fallan por CORS.
 - **Caracteres corruptos en .tsx**: Si aparecen errores como `className=\"...\"`, es corrupción de encoding. Reemplazar `\"` por `"`.
 
 ## Flujo de trabajo típico
@@ -160,7 +167,7 @@ COP_KWH=839                    # Costo kWh en Colombia
 IVA_PCT=19                     # IVA Colombia
 DEFAULT_MARGIN_PCT=100         # Margen por defecto (precio = costo × 2)
 LABOR_RATE_COP=6470           # Tarifa mano de obra por hora
-CORS_ORIGINS=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173,http://localhost:5174
 ```
 
 ## Referencias

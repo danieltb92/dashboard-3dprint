@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Search, X, ShoppingCart, DollarSign } from 'lucide-react';
-import { Skeleton, SkeletonTable } from '../components/ui/Skeleton';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Table, createColumns } from '../components/ui/Table';
+import { Skeleton, SkeletonTable } from '../components/ui/skeleton';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Table, createColumns } from '../components/ui/table';
 import api from '../services/api';
-import { useToast } from '../components/ui/Toast';
+import { toast } from "sonner";
 
 interface Sale {
   id: number;
@@ -49,7 +49,7 @@ const ICON_X = <X className="h-5 w-5" />;
 const ICON_DOLLAR = <DollarSign className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />;
 
 export const Pedidos = () => {
-  const toast = useToast();
+  
   const [sales, setSales] = useState<Sale[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -354,7 +354,7 @@ export const Pedidos = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
-            leftIcon={null}
+            
           />
         </div>
       </Card>

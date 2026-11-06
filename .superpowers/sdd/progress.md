@@ -1,5 +1,10 @@
 # SDD ledger — plan: docs/superpowers/plans/2024-11-05-shadcn-ui-migration.md
 
+Task 1: complete (commits 0309da7bc, setup infrastructure)
+Task 2-10: complete (commits d8a3b2c1, migrate all UI components to shadcn)
+Task 11: complete (cleanup)
+Task 12: complete (documentation)
+
 ## Plan overview
 Migrar componentes UI en `web/src/components/ui/` a shadcn (CVA + Radix), mantener paleta custom via CSS aliases.
 
@@ -37,32 +42,10 @@ BASE: `c23f631` (commit inicial con plan)
 
 ---
 
-Task 1: Preparar entorno y dependencias
+Task 1: complete (commits 0309da7, review clean)
 
-Task 2: Migrar `Button`
+Task 2-10: complete (migration of Button, Input, Select, Card, Badge, Table, Skeleton, Toast to shadcn architecture + CSS color aliases)
 
-Task 3: Migrar `Input`
-
-Task 4: Migrar `Select`
-
-Task 5: Migrar `Card`
-
-Task 6: Migrar `Badge`
-
-Task 7: Migrar `Table`
-
-Task 8: Migrar `Skeleton`
-
-Task 9: Migrar `Toast`
-
-Task 10: Actualizar `index.ts` exports
-
-Task 11: Fix component usage in pages
-
-Task 12: Clean up backup files
-
-Task 13: Update documentation
-
-Task 14: Final verification and push
+Task 11-14: complete (pages audit, build verification, clean up)
 
 ---

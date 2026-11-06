@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { LayoutDashboard, Package, FileText, Boxes, ShoppingCart, ArrowRight, CheckCircle2, Circle, Printer, Wrench, Calculator, Sun, Moon, Cloud, Lightbulb, TrendingUp, DollarSign, TrendingDown } from 'lucide-react';
-import { Skeleton } from '../components/ui/Skeleton';
-import { Card, CardHeader, CardContent } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
+import { Skeleton } from '../components/ui/skeleton';
+import { Card, CardHeader, CardContent } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 import api from '../services/api';
 
 interface Product {

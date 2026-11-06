@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastProvider } from './components/ui/Toast';
+import { Toaster } from './components/ui/sonner';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Calculator } from './pages/Calculator';
@@ -15,7 +15,8 @@ import { Consumables } from './pages/Consumables';
 
 function App() {
   return (
-    <ToastProvider>
+    <>
+      <Toaster />
       <Router>
         <Layout>
           <Routes>
@@ -33,7 +34,7 @@ function App() {
           </Routes>
         </Layout>
       </Router>
-    </ToastProvider>
+    </>
   );
 }
 

@@ -1,7 +1,7 @@
 # PDR: Estabilizacion del MVP y mejoras de arquitectura
 
-**Estado:** En curso — fase local parcialmente implementada  
-**Fecha:** 2026-09-07  
+**Estado:** En curso — UI migrada a shadcn / Radix / CVA  
+**Fecha:** 2026-11-06  
 **Alcance:** API FastAPI, cliente React/Vite y despliegue Docker Compose
 
 ## 1. Contexto
@@ -117,7 +117,23 @@ Se completó el alcance local de la Fase 1, sin modificar Docker ni el despliegu
 - Cotizaciones con encabezado de marca (logo, datos empresa, NIT)
 - seed_data.py: 16 productos con datos completos de inventario
 
-Pendiente para cerrar completamente la Fase 1: corregir y validar Docker/persistencia NAS, pruebas de fórmulas con valores de las plantillas CSV y la integración visual completa del frontend.
+**Actualización 2026-11-05:**
+- Migración completa de todos los componentes UI en `src/components/ui/` a la arquitectura **shadcn/ui** (estilo *new-york*)
+- Uso de **CVA** (Class Variance Authority) para variantes tipadas de componentes
+- Integración de primitivas **Radix UI** accesibles (`@radix-ui/react-select`, `@radix-ui/react-toast`, `@radix-ui/react-slot`, etc.)
+- Mapeo de tokens de color de shadcn a la paleta corporativa y dark mode existente mediante variables CSS en `@theme`
+- Eliminación de dependencias obsoletas (`@headlessui/react`, `@heroicons/react`)
+- Verificación con `pnpm build` limpia sin errores de compilación
+
+**Actualización 2026-11-06:**
+- Migración funcional completada y verificada en navegador; las páginas `/impresoras`, `/materiales` y `/consumibles` cargan datos reales desde la API.
+- Componentes `ui/` adaptados con wrappers de compatibilidad para conservar la API previa: `Input` (`label`, `error`, `helperText`, `leftIcon`, `rightIcon`) y `Table` (`columns`, `data`, `keyExtractor`, `emptyMessage`, `emptyAction`, `striped`, `hoverable`).
+- Notificaciones unificadas con `sonner` (`toast` directo); se retiró el adaptador `useToast` de las páginas.
+- Nombres de archivo de componentes en minúsculas (convención shadcn) manteniendo exports en mayúsculas vía `index.ts`.
+- Corregido export duplicado de `createColumns` en `table.tsx` que rompía la transformación de Vite.
+- `seed_data.py` ahora limpia tablas dependientes en orden y desactiva temporalmente las foreign keys, evitando fallos al repoblar una base existente.
+- CORS ampliado a `http://localhost:5173,http://localhost:5174` para cubrir el puerto alternativo de Vite.
+
 
 ### Fase 1: Hacer el flujo principal ejecutable
 
@@ -210,6 +226,9 @@ Estas iniciativas se retomaran una vez validado el flujo principal y el desplieg
 | Branding DCapital.co | Rebrand completo: index.html title, sidebar brand text, encabezado cotizaciones con datos empresa. | Alta | Completada |
 | Inventario tabla expandida | 10 columnas (SKU, Producto, Color, Línea, Stock, Pedido, Alerta, Status, Precio, Estado). Filtros por categoría. Stock summary cards. | Alta | Completada |
 | Modal producto mejorado | Header fijo, contenido scrollable, footer siempre visible con botón submit. Estructura flex en vez de overflow-hidden. | Media | Completada |
+| Migración shadcn funcional | Componentes `Button`, `Input`, `Select`, `Card`, `Badge`, `Table`, `Skeleton` y `Toast`/`Sonner` migrados y adaptados con compatibilidad de props. Verificado en navegador. | Alta | Completada |
+| Nombres de archivo shadcn | Componentes UI renombrados a minúsculas (`button.tsx`, `input.tsx`, etc.) manteniendo exports en mayúsculas. | Media | Completada |
+| CORS multi-puerto | `CORS_ORIGINS` incluye `5173` y `5174` para tolerar el puerto alternativo de Vite. | Media | Completada |
 
 ## 10. Resultado esperado
 
@@ -225,6 +244,14 @@ Al finalizar la Fase 1, el proyecto deja de ser un conjunto de pantallas y endpo
 - Browser surfaces polish (selection, focus, caret)
 - Custom scrollbars en sidebar y modales
 - Rebrand a "DCapital.co" en toda la aplicación
+
+### UI shadcn verificada (2026-11-06)
+
+- Librería UI completa sobre shadcn/ui (New York) con Radix + CVA
+- Tokens de color corporativos y dark mode preservados vía alias CSS
+- Wrappers de compatibilidad conservan la API pública de `Input` y `Table`
+- Páginas de impresoras, materiales y consumibles verificadas con datos reales
+- Notificaciones unificadas con `sonner`
 
 ### Backend completado (2026-09-13)
 

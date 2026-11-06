@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calculator as CalculatorIcon, Save, FileSpreadsheet, RefreshCw, Info, CheckCircle, Clock, Timer, Scale, Zap, HardHat, Wrench, Package, Percent } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
 import api from '../services/api';
-import { useToast } from '../components/ui/Toast';
+import { toast } from "sonner";
 
 interface Printer {
   id: number;
@@ -74,7 +74,7 @@ const EMPTY_STATE_CHECKS = [
 ] as const;
 
 export const Calculator = () => {
-  const toast = useToast();
+  
   const [printers, setPrinters] = useState<Printer[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [formData, setFormData] = useState({
